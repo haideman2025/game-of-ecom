@@ -1,0 +1,126 @@
+# ============================================================
+# Game of Ecom — .gitignore
+# Whitelist approach: exclude everything personal/dev-only,
+# only commit Game of Ecom source + Pages Functions + schemas
+# ============================================================
+
+# ─────────────── Personal & unrelated docs ───────────────
+# Brand strategy / finance docs (Deman/Oniiz private work)
+*.docx
+*.pdf
+*.pptx
+*.xlsx
+*.skill
+MODEL_SUMMARY*.txt
+Phan_Tich_*.txt
+brand-genesis-studio-unified-architecture.html
+game-of-ecom-architecture.html
+game-of-ecom-strategy.html
+goe-design-system.html
+goe-storage-architecture.html
+goe-video-studio-research.html
+Slide_Chien_Luoc_*.html
+fix-google-403-walkthrough.html
+Oniiz_Packaging_Briefs_v1/
+Oniiz_Repositioning/
+
+# ─────────────── Office lock files & temp ───────────────
+.~lock.*
+__refresh.tmp
+.refresh
+_sync_test.txt
+_patch*.py
+_v*_patch.py
+
+# ─────────────── Backups & old versions ───────────────
+*.broken.html
+*.bak
+*.bak.before_patch_*
+index.html.new
+index.html.v41
+fb-pack-studio-deploy/index.html.bak*
+fb-pack-studio-deploy/index.html.new
+fb-pack-studio-deploy/index.html.v41
+fb-pack-studio-deploy/fb-pack-studio.html
+
+# ─────────────── Old deploy scripts ───────────────
+fb-pack-studio-deploy/deploy_fb.ps1
+fb-pack-studio-deploy/deploy_v9*.ps1
+fb-pack-studio-deploy/deploy_v10.ps1
+fb-pack-studio-deploy/deploy_v11.ps1
+fb-pack-studio-deploy/deploy_v11_*.ps1
+fb-pack-studio-deploy/deploy_v12.ps1
+fb-pack-studio-deploy/deploy_v12_1.ps1
+
+# ─────────────── Snapshots / archives ───────────────
+*.zip
+ai-studio-fb-pack-kit/
+fb-pack-studio-deploy-old/
+
+# ─────────────── Cloudflare cache + secrets ───────────────
+.wrangler/
+**/.wrangler/
+fb-pack-studio-deploy/.dev.vars
+fb-pack-studio-deploy/.env
+.env
+.env.local
+.env.production
+
+# ─────────────── Audio bundle (too large for git) ───────────────
+# 42MB CC0 music — fetch from freepd.com per README
+fb-pack-studio-deploy/audio/
+
+# ─────────────── Node ───────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ─────────────── OS / IDE ───────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ─────────────── Build outputs ───────────────
+dist/
+build/
+.next/
+out/
+
+# ─────────────── Logs ───────────────
+logs/
+*.log
+
+# ─────────────── Local secrets ───────────────
+**/secrets.json
+**/credentials.json
+service-account*.json
+
+# ─────────────── V22.7.1 — Additional exclusions found post-commit ───────────────
+# Personal brand work (any extension)
+Oniiz_*
+Hyro_*
+*_Hyro_*
+Phan_Tich_Tai_Chinh_*
+Chien_Luoc_Tai_Chinh_*
+
+# Loose slide images at root
+slide-*.jpg
+slide-*.png
+slide-*.jpeg
+
+# Image binaries at root (personal brand visuals)
+/*.png
+/*.jpg
+/*.jpeg
+
+# Temp files
+*.tmp
+*.temp

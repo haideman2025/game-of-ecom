@@ -1,0 +1,310 @@
+            ['product','📦 Product',counts.product],
+            ['image','🖼️ Post Images',counts.image],
+            ['video','🎬 Videos',counts.video],
+            ['audio','🎙️ Voice',counts.audio],
+          ].map(([v,l,c])=>(
+            <button key={v} onClick={()=>setTab(v)} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${tab===v ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 hover:bg-gray-100'}`}>
+              {l} <span className="opacity-60 ml-1">({c})</span>
+            </button>
+          ))}
+          <div className="flex-1"></div>
+          <button onClick={handleDownloadAll} disabled={!filtered.length} className="text-sm px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-30">📦 Download {tab==='all'?'all':tab+'s'} ZIP</button>
+          <button onClick={handleClearAll} disabled={!assets.length} className="text-sm px-3 py-1.5 rounded-lg bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-30">🗑️ Clear all</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 md:p-5">
+          {loading && <div className="text-center py-12 text-gray-500"><Spinner size={28}/></div>}
+          {!loading && !filtered.length && <div className="text-center py-12 text-gray-500 text-sm">No assets in this category yet. Generate some images/videos!</div>}
+          {!loading && filtered.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {filtered.map(a => (
+                <div key={a.id} className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition group">
+                  <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden relative">
+                    {a.type === 'video' ? (
+                      <video src={`data:${a.mime};base64,${a.base64}`} className="w-full h-full object-cover" controls muted preload="metadata"/>
+                    ) : a.type === 'audio' ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-amber-300 p-2 gap-2">
+                        <div className="text-4xl">🎙️</div>
+                        <audio src={`data:${a.mime};base64,${a.base64}`} controls className="w-full" preload="metadata"/>
+                      </div>
+                    ) : (
+                      <img src={`data:${a.mime};base64,${a.base64}`} className="w-full h-full object-cover" alt={a.type}/>
+                    )}
+                    <span className="absolute top-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wide">{a.type}</span>
+                    {a.postN && <span className="absolute top-1 right-1 bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">#{a.postN}</span>}
+                  </div>
+                  <div className="p-2 text-xs">
+                    <div className="text-gray-500 truncate" title={a.source || a.id}>{a.source || 'unknown'}</div>
+                    <div className="text-gray-400 text-[10px]">{formatBytes(a.sizeBytes)} · {new Date(a.createdAt).toLocaleString('vi-VN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})}</div>
+                    <div className="flex gap-1 mt-1.5">
+                      <button onClick={()=>handleDownload(a)} className="flex-1 text-[11px] py-1 rounded bg-gray-100 hover:bg-gray-200" title="Download">⬇️</button>
+                      {(a.type==='mascot' || a.type==='product') && onUseAsRef && (
+                        <button onClick={()=>{ onUseAsRef(a); setToast?.({type:'success', msg:`Added as ${a.type} reference`}); }} className="flex-1 text-[11px] py-1 rounded bg-indigo-100 hover:bg-indigo-200" title="Use as reference">🔁</button>
+                      )}
+                      <button onClick={()=>handleDelete(a.id)} className="flex-1 text-[11px] py-1 rounded bg-rose-100 hover:bg-rose-200" title="Delete">🗑️</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   App — root
+   ============================================================ */
+function App() {
+  const [apiKey, setApiKey] = useState("");
+  const [model, setModel] = useState("gemini-3-pro-image-preview");
+  const [brand, setBrand] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [generatedImages, setGeneratedImages] = useState({});
+  const [mascotRefs, setMascotRefs] = useState([]);
+  const [productRefs, setProductRefs] = useState([]);
+  const [uiState, setUiState] = useState("welcome");
+  const [showSettings, setShowSettings] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [videoModalPost, setVideoModalPost] = useState(null);
+  const [voiceModalPost, setVoiceModalPost] = useState(null);
+  const [editPost, setEditPost] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [generatingPostN, setGeneratingPostN] = useState(null);
+  const [batchProgress, setBatchProgress] = useState(0);
+  const [batchTotal, setBatchTotal] = useState(0);
+  const batchCancelRef = useRef(false);
+  const [wizDraft, setWizDraft] = useState(loadWiz());
+
+  // Bootstrap
+  useEffect(() => {
+    const data = loadLS();
+    if (data) {
+      if (data.apiKeyObf) setApiKey(deobfuscate(data.apiKeyObf));
+      if (data.model) {
+        // Auto-migrate legacy model names (May 2026 rename: image models all require -preview suffix)
+        const MODEL_MIGRATION = {
+          "gemini-3-pro-image": "gemini-3-pro-image-preview",
+          "gemini-3.1-flash-image": "gemini-3.1-flash-image-preview"
+        };
+        setModel(MODEL_MIGRATION[data.model] || data.model);
+      }
+      if (data.brand) setBrand(data.brand);
+      if (data.posts) setPosts(data.posts);
+      if (data.mascotRefs) setMascotRefs(data.mascotRefs);
+      if (data.productRefs) setProductRefs(data.productRefs);
+      if (data.brand && data.posts && data.posts.length > 0) setUiState("main");
+    }
+    (async () => {
+      try {
+        const ks = await idbKeys();
+        const imgs = {};
+        for (const k of ks) {
+          if (typeof k === 'string' && k.startsWith('fbp-img-')) {
+            const n = parseInt(k.replace('fbp-img-',''),10);
+            imgs[n] = await idbGet(k);
+          }
+        }
+        setGeneratedImages(imgs);
+      } catch(e) { console.warn(e); }
+      setLoaded(true);
+    })();
+  }, []);
+
+  // Persist
+  useEffect(() => {
+    if (!loaded) return;
+    saveLS({ apiKeyObf: apiKey ? obfuscateKey(apiKey) : "", model, brand, posts, mascotRefs, productRefs });
+  }, [apiKey, model, brand, posts, mascotRefs, productRefs, loaded]);
+
+  const handleLoadDemo = () => {
+    setBrand(DEMO_DATA.brand); setPosts(DEMO_DATA.posts); setUiState("main");
+    setToast({type:"success",msg:`Demo loaded: ${DEMO_DATA.posts.length} posts`});
+  };
+
+  const handleLoadJSON = (obj) => { setBrand(obj.brand); setPosts(obj.posts); setUiState("main"); };
+
+  const handleNewPack = () => {
+    if (posts.length > 0 && !confirm("Clear current pack and start over? Generated images will be deleted.")) return;
+    setBrand(null); setPosts([]); setGeneratedImages({}); setMascotRefs([]); setProductRefs([]);
+    clearAllImages(); clearWiz(); setWizDraft(null); setUiState("welcome");
+  };
+
+  const saveSettings = (k, m) => { setApiKey(k); setModel(m); };
+
+  const generatePostImage = async (post) => {
+    if (!apiKey) { setToast({type:"warn",msg:"Set API key in Settings first"}); return; }
+    setGeneratingPostN(post.n);
+    try {
+      const parts = buildImageParts(post, brand, mascotRefs, productRefs);
+      const b64 = await geminiGenerateImage(apiKey, model, parts);
+      await saveImage(post.n, b64);
+      setGeneratedImages(prev => ({...prev, [post.n]: b64}));
+      setToast({type:"success",msg:`✓ Image for post #${post.n} generated`});
+    } catch(e) {
+      let msg = e.message || "";
+      if (e.status === 401 || msg.includes("401")) msg = "401 — Invalid API key";
+      else if (e.status === 403 || msg.includes("403")) msg = "403 — Billing not enabled. Visit console.cloud.google.com → Billing";
+      else if (e.status === 429 || msg.includes("429")) msg = "429 — Rate limited, wait 30s";
+      else msg = "Failed: " + msg.slice(0,100);
+      setToast({type:"error",msg,duration:7000});
+    } finally { setGeneratingPostN(null); }
+  };
+
+  const handleGenerateAll = async () => {
+    if (!apiKey) { setToast({type:"warn",msg:"Set API key first"}); return; }
+    const toGen = posts.filter(p => !generatedImages[p.n]);
+    if (toGen.length === 0) { setToast({type:"info",msg:"All images already generated"}); return; }
+    const cost = (toGen.length * 0.13).toFixed(2);
+    if (!confirm(`Generate ${toGen.length} images sequentially (~$${cost})?\n\n2s delay between requests to avoid rate limiting.`)) return;
+    setBatchTotal(toGen.length); setBatchProgress(0); batchCancelRef.current = false;
+    let done = 0, failed = 0;
+    for (const p of toGen) {
+      if (batchCancelRef.current) break;
+      try {
+        const parts = buildImageParts(p, brand, mascotRefs, productRefs);
+        const b64 = await geminiGenerateImage(apiKey, model, parts);
+        await saveImage(p.n, b64);
+        setGeneratedImages(prev => ({...prev, [p.n]: b64}));
+        done++;
+      } catch(e) { failed++; console.warn("Failed", p.n, e); }
+      setBatchProgress(done + failed);
+      await sleep(2000);
+    }
+    setBatchTotal(0); setBatchProgress(0);
+    setToast({type: failed > 0 ? "warn" : "success", msg: `Generated ${done}/${toGen.length}${failed ? ` (${failed} failed)` : ""}`, duration: 6000});
+  };
+
+  const handleWizComplete = (pack, alsoGenImages) => {
+    setBrand(pack.brand);
+    setPosts(pack.posts);
+    setShowWizard(false);
+    setUiState("main");
+    if (alsoGenImages) setTimeout(() => handleGenerateAll(), 500);
+  };
+
+  const handleEditSave = (updated) => {
+    setPosts(prev => prev.map(p => p.n === updated.n ? updated : p));
+    setToast({type:"success",msg:"Post updated"});
+  };
+
+  const handleExport = async () => {
+    try { await exportZip(brand, posts, generatedImages, mascotRefs, productRefs); setToast({type:"success",msg:"ZIP downloaded"}); }
+    catch(e) { setToast({type:"error",msg:"Export failed: " + e.message.slice(0,80)}); }
+  };
+
+  const filteredPosts = useMemo(() => {
+    let arr = posts;
+    if (filter !== "all") arr = arr.filter(p => String(p.pillar) === filter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      arr = arr.filter(p => (p.caption || "").toLowerCase().includes(q) || (p.title || "").toLowerCase().includes(q));
+    }
+    return arr;
+  }, [posts, filter, search]);
+
+  if (!loaded) {
+    return <div className="min-h-screen flex items-center justify-center text-white"><Spinner size={36} /></div>;
+  }
+
+  return (
+    <div className="min-h-screen pb-12">
+      {uiState !== "welcome" && (
+        <AppHeader
+          brandName={brand?.name}
+          onSettings={()=>setShowSettings(true)}
+          onNewPack={handleNewPack}
+          onLibrary={()=>setShowLibrary(true)}
+          hasApiKey={!!apiKey}
+          canExport={posts.length > 0}
+          onExport={handleExport}
+          onGenerateAll={handleGenerateAll}
+          generating={batchTotal > 0}
+        />
+      )}
+
+      {uiState === "welcome" && (
+        <WelcomeScreen
+          onStartWizard={()=>{ setShowWizard(true); }}
+          onPasteJSON={()=>setShowPaste(true)}
+          onLoadDemo={handleLoadDemo}
+          onSettings={()=>setShowSettings(true)}
+          hasApiKey={!!apiKey}
+          hasWizDraft={!!wizDraft}
+          onResumeWiz={()=>setShowWizard(true)}
+        />
+      )}
+
+      {uiState === "main" && (
+        <div className="max-w-7xl mx-auto p-4 md:p-6">
+          <BrandIntakePanel
+            brand={brand} setBrand={setBrand}
+            mascotRefs={mascotRefs} setMascotRefs={setMascotRefs}
+            productRefs={productRefs} setProductRefs={setProductRefs}
+            apiKey={apiKey} model={model} setToast={setToast}
+            onPasteJSON={()=>setShowPaste(true)}
+          />
+          <StatsBar posts={posts} brand={brand} />
+          <FilterBar filter={filter} setFilter={setFilter} search={search} setSearch={setSearch} count={filteredPosts.length} total={posts.length} />
+          <div className="grid gap-4">
+            {filteredPosts.map(p => (
+              <PostCard
+                key={p.n}
+                post={p}
+                brand={brand}
+                imageB64={generatedImages[p.n]}
+                mascotRefs={mascotRefs}
+                generating={generatingPostN === p.n}
+                onGenerate={generatePostImage}
+                onEdit={setEditPost}
+                onMakeVideo={setVideoModalPost}
+                onMakeVoice={setVoiceModalPost}
+                setToast={setToast}
+              />
+            ))}
+            {filteredPosts.length === 0 && (
+              <div className="glass-card p-8 text-center text-gray-500">No posts match the current filter.</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showSettings && <SettingsModal apiKey={apiKey} model={model} onSave={saveSettings} onClose={()=>setShowSettings(false)} setToast={setToast} />}
+      {showPaste && <PasteJSONModal onClose={()=>setShowPaste(false)} onLoad={handleLoadJSON} setToast={setToast} />}
+      {showWizard && (
+        <WizardModal
+          onClose={()=>setShowWizard(false)}
+          onComplete={handleWizComplete}
+          apiKey={apiKey} model={model} setToast={setToast}
+          draft={wizDraft}
+          onSaveDraft={(d)=>{ saveWiz(d); setWizDraft(d); }}
+          onClearDraft={()=>{ clearWiz(); setWizDraft(null); }}
+          mascotRefs={mascotRefs} setMascotRefs={setMascotRefs}
+        />
+      )}
+      {editPost && <EditPostModal post={editPost} onClose={()=>setEditPost(null)} onSave={handleEditSave} />}
+      {showLibrary && <AssetLibrary brand={brand} onClose={()=>setShowLibrary(false)} setToast={setToast} onUseAsRef={(a)=>{
+        const ref = { mime: a.mime, base64: a.base64 };
+        if (a.type === 'mascot') setMascotRefs(prev=>[...prev, ref]);
+        else if (a.type === 'product') setProductRefs(prev=>[...prev, ref]);
+      }} />}
+      {videoModalPost && <VideoGenModal post={videoModalPost} imageB64={generatedImages[videoModalPost.n]} apiKey={apiKey} brand={brand} onClose={()=>setVideoModalPost(null)} setToast={setToast} onSuccess={(meta)=>{ setVideoModalPost(null); }} />}
+      {voiceModalPost && <VoiceGenModal post={voiceModalPost} apiKey={apiKey} brand={brand} onClose={()=>setVoiceModalPost(null)} setToast={setToast} onSuccess={()=>{}} />}
+
+      <GenerateAllBar progress={batchProgress} total={batchTotal} onCancel={()=>{ batchCancelRef.current = true; }} />
+      <Toast toast={toast} onClose={()=>setToast(null)} />
+    </div>
+  );
+}
+
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

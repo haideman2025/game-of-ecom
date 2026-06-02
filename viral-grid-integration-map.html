@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viral Grid Master × Game of Ecom — Integration Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0A0F1E;
+    --bg-card: #131A2E;
+    --bg-elev: #1A2240;
+    --bg-glow: #20294A;
+    --gold: #F59E0B;
+    --gold-bright: #FBBF24;
+    --orange: #DE6332;
+    --crimson: #DC2626;
+    --cyan: #06B6D4;
+    --cyan-bright: #22D3EE;
+    --emerald: #10B981;
+    --rose: #EF4444;
+    --purple: #A78BFA;
+    --pink: #EC4899;
+    --indigo: #6366F1;
+    --text: #F1F5F9;
+    --text-muted: #94A3B8;
+    --text-dim: #64748B;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: linear-gradient(135deg, #0A0F1E 0%, #131A2E 40%, #1A2240 100%);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .display { font-family: 'Bowlby One', sans-serif; letter-spacing: 0.02em; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .container { max-width: 1480px; margin: 0 auto; padding: 0 24px; }
+
+  /* ═══════════════ HERO ═══════════════ */
+  .hero {
+    position: relative;
+    padding: 90px 0 70px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 20% 30%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 80% 50%, rgba(167, 139, 250, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 600px 400px at 50% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    color: var(--gold-bright);
+    position: relative;
+    z-index: 1;
+  }
+  .hero-tag::before { content: '🧬'; font-size: 14px; }
+  .hero h1 {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(38px, 6vw, 76px);
+    line-height: 0.95;
+    background: linear-gradient(135deg, var(--gold-bright) 0%, var(--pink) 50%, var(--cyan-bright) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    margin: 24px auto 16px;
+    max-width: 780px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-meta b { color: var(--gold); }
+
+  /* ═══════════════ PHILOSOPHY ═══════════════ */
+  .philosophy {
+    background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(236,72,153,0.06));
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 32px;
+    padding: 48px;
+    margin: 40px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .philosophy::before {
+    content: '"';
+    position: absolute;
+    top: -40px;
+    left: 20px;
+    font-family: Georgia, serif;
+    font-size: 240px;
+    color: rgba(245,158,11,0.08);
+    font-weight: 900;
+  }
+  .philosophy-quote {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(20px, 3vw, 32px);
+    background: linear-gradient(90deg, var(--gold), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .phil-author { color: var(--text-muted); font-size: 13px; font-style: italic; position: relative; z-index: 1; }
+  .phil-cycle {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .phil-stage {
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--p-color);
+    border-radius: 100px;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 14px;
+    color: var(--p-color);
+    transition: transform 0.3s;
+  }
+  .phil-stage:hover { transform: translateY(-4px) scale(1.05); }
+  .phil-arrow { display: flex; align-items: center; color: var(--text-muted); font-size: 24px; padding: 0 8px; }
+  .phil-stage[data-s="research"] { --p-color: var(--cyan); }
+  .phil-stage[data-s="experiment"] { --p-color: var(--purple); }
+  .phil-stage[data-s="package"] { --p-color: var(--pink); }
+  .phil-stage[data-s="transfer"] { --p-color: var(--gold); }
+
+  /* ═══════════════ SECTIONS ═══════════════ */
+  section { padding: 70px 0; position: relative; }
+  .section-header { margin-bottom: 48px; max-width: 900px; }
+  .section-tag {
+    display: inline-block;
+    padding: 5px 14px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-bd);
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--tag-c);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(30px, 4.5vw, 52px);
+    line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  .section-desc { color: var(--text-muted); font-size: 16px; line-height: 1.7; }
+  .section-desc b { color: var(--text); }
+
+  /* ═══════════════ 4-PHASE CARDS ═══════════════ */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 24px;
+  }
+  @media (max-width: 1024px) { .phase-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 580px) { .phase-grid { grid-template-columns: 1fr; } }
+  .phase-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .phase-card:hover { transform: translateY(-6px); border-color: var(--p-c); }
+  .phase-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--p-c), var(--p-c2));
+  }
+  .phase-card[data-p="1"] { --p-c: var(--cyan); --p-c2: var(--purple); }
+  .phase-card[data-p="2"] { --p-c: var(--purple); --p-c2: var(--pink); }
+  .phase-card[data-p="3"] { --p-c: var(--pink); --p-c2: var(--gold); }
+  .phase-card[data-p="4"] { --p-c: var(--gold); --p-c2: var(--emerald); }
+
+  .phase-num {
+    display: inline-block;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 12px;
+    padding: 3px 10px;
+    background: rgba(245,158,11,0.15);
+    color: var(--p-c);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+  .phase-skill { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .phase-title { font-family: 'Bowlby One', sans-serif; font-size: 18px; margin-bottom: 8px; }
+  .phase-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6; }
+  .phase-out {
+    background: var(--bg-elev);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 11px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+  }
+  .phase-out-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .phase-num-metric { font-family: 'Bowlby One', sans-serif; color: var(--p-c); font-size: 16px; }
+
+  /* ═══════════════ BEFORE / AFTER ═══════════════ */
+  .ba-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  @media (max-width: 768px) { .ba-grid { grid-template-columns: 1fr; } }
+  .ba-side {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+  }
+  .ba-before { --label-c: var(--rose); }
+  .ba-after { --label-c: var(--emerald); border-color: rgba(16,185,129,0.4); background: linear-gradient(135deg, rgba(16,185,129,0.05), var(--bg-card)); }
+  .ba-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--label-c);
+    color: var(--label-c);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .ba-title { font-family: 'Bowlby One', sans-serif; font-size: 18px; margin-bottom: 14px; }
+  .ba-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ba-step {
+    background: var(--bg-elev);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border-left: 3px solid var(--label-c);
+  }
+  .ba-step.weak { opacity: 0.5; }
+  .ba-step.new { background: linear-gradient(90deg, rgba(16,185,129,0.1), var(--bg-elev)); }
+  .ba-arrow-mid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--gold);
+  }
+  .ba-flaws { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 12px; }
+  .ba-flaw { color: var(--rose); margin-bottom: 6px; padding-left: 18px; position: relative; }
+  .ba-flaw::before { content: '✗'; position: absolute; left: 0; font-weight: 700; }
+  .ba-win { color: var(--emerald); margin-bottom: 6px; padding-left: 18px; position: relative; }
+  .ba-win::before { content: '✓'; position: absolute; left: 0; font-weight: 700; }
+
+  /* ═══════════════ ARCHITECTURE 7-LAYER ═══════════════ */
+  .layer-7 {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 24px;
+  }
+  .layer-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--lr-c);
+    border-radius: 16px;
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: 80px 1fr 1.5fr;
+    gap: 24px;
+    align-items: center;
+    transition: transform 0.2s;
+  }
+  @media (max-width: 768px) { .layer-row { grid-template-columns: 60px 1fr; .lr-bullets { grid-column: 1 / -1; } } }
+  .layer-row:hover { transform: translateX(4px); }
+  .layer-row[data-l="0"] { --lr-c: var(--gold); }     /* Intake */
+  .layer-row[data-l="1"] { --lr-c: var(--cyan); }     /* Research */
+  .layer-row[data-l="2"] { --lr-c: var(--purple); }   /* Experiment */
+  .layer-row[data-l="3"] { --lr-c: var(--pink); }     /* Package */
+  .layer-row[data-l="4"] { --lr-c: var(--gold-bright); } /* Transfer */
+  .layer-row[data-l="5"] { --lr-c: var(--emerald); }  /* GoE Pack */
+  .layer-row[data-l="6"] { --lr-c: var(--orange); }   /* Distribution */
+
+  .lr-num {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--lr-c), var(--bg-elev));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 26px;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .lr-main h3 { font-family: 'Bowlby One', sans-serif; font-size: 19px; margin-bottom: 4px; }
+  .lr-main p { color: var(--text-muted); font-size: 12px; }
+  .lr-bullets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .lr-pill {
+    padding: 5px 10px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+  }
+  .lr-pill.new { background: rgba(245,158,11,0.1); border-color: var(--gold); color: var(--gold); }
+  .lr-pill.existing { color: var(--cyan); }
+
+  /* ═══════════════ SKILLS NETWORK ═══════════════ */
+  .network-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .net-svg { width: 100%; min-width: 1100px; height: auto; }
+
+  /* ═══════════════ MCP TOOLS ═══════════════ */
+  .mcp-new {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .mcp-tool {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--mcp-c);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+  .mcp-tool:hover { transform: translateX(4px); background: var(--bg-elev); }
+  .mcp-tool[data-m="strategy"] { --mcp-c: var(--purple); }
+  .mcp-tool[data-m="bridge"] { --mcp-c: var(--gold); }
+  .mcp-tool[data-m="phase"] { --mcp-c: var(--cyan); }
+  .mcp-status {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .mcp-status.new { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .mcp-status.upgrade { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .mcp-tool-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .mcp-tool-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .mcp-tool-chain { margin-top: 8px; font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; padding-top: 8px; border-top: 1px dashed var(--border); }
+
+  /* ═══════════════ JSON ARTIFACTS ═══════════════ */
+  .artifacts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .artifact {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+  }
+  .artifact-icon { font-size: 26px; margin-bottom: 8px; }
+  .artifact-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); margin-bottom: 6px; }
+  .artifact-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .artifact-schema {
+    background: var(--bg-deep);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  /* ═══════════════ WORKFLOW SCENARIOS ═══════════════ */
+  .scenario {
+    background: linear-gradient(135deg, rgba(167,139,250,0.05), var(--bg-card));
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 18px;
+  }
+  .scenario-prompt {
+    background: rgba(167,139,250,0.1);
+    border-left: 4px solid var(--purple);
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: 18px;
+    font-size: 14px;
+  }
+  .scenario-prompt::before { content: '💬 '; }
+  .scenario-chain {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .chain-step {
+    flex: 0 0 200px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+    font-size: 12px;
+  }
+  .chain-tool { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cyan); margin-bottom: 6px; }
+  .chain-result { color: var(--text-muted); font-size: 11px; line-height: 1.4; }
+  .chain-arrow {
+    display: flex; align-items: center;
+    color: var(--gold);
+    font-size: 22px;
+    padding: 0 4px;
+    flex: 0 0 24px;
+  }
+
+  /* ═══════════════ ROADMAP ═══════════════ */
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .rm-phase {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .rm-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--rm-bg);
+    color: var(--rm-c);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .rm-title { font-family: 'Bowlby One', sans-serif; font-size: 18px; margin-bottom: 10px; }
+  .rm-meta { font-size: 11px; color: var(--text-dim); margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; }
+  .rm-list { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+  .rm-list li { padding-left: 18px; position: relative; list-style: none; margin-bottom: 4px; }
+  .rm-list li::before { content: '▸'; position: absolute; left: 0; color: var(--rm-c); }
+
+  /* ═══════════════ REVIEW CTA ═══════════════ */
+  .review-card {
+    background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(236,72,153,0.1));
+    border: 2px solid var(--gold);
+    border-radius: 28px;
+    padding: 40px;
+    text-align: center;
+    margin: 48px 0;
+  }
+  .review-card h3 { font-family: 'Bowlby One', sans-serif; font-size: 28px; margin-bottom: 12px; color: var(--gold); }
+  .review-card p { color: var(--text-muted); font-size: 15px; max-width: 600px; margin: 0 auto 20px; }
+  .review-options { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .review-opt {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .review-opt b { color: var(--gold); display: block; margin-bottom: 4px; font-family: 'Bowlby One', sans-serif; font-size: 16px; }
+
+  footer { padding: 50px 0 30px; text-align: center; color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HERO ═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-tag">VIRAL GRID MASTER × GAME OF ECOM · REVIEW MODE</div>
+    <h1>NÂNG CẤP HỆ THỐNG<br>TỪ TACTICAL → STRATEGIC</h1>
+    <div class="hero-sub">
+      Tích hợp viral-grid-master (orchestrator 4-phase) làm <b style="color:var(--gold-bright)">strategy layer</b> phía trên Game of Ecom hiện tại.<br>
+      Mỗi pack giờ chạy theo principle <b>RESEARCH → EXPERIMENT → PACKAGE → TRANSFER</b>, không còn chỉ "brief → 30 posts".
+    </div>
+    <div class="hero-meta">
+      AI Architect mode · <b>Pre-execution review</b> · 7 layers · 12 new MCP tools · 5 new JSON artifacts
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ PHILOSOPHY ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="philosophy">
+      <div class="philosophy-quote">VIRAL ĐÚNG BẢN CHẤT LÀ QUY TRÌNH</div>
+      <div class="phil-author">— viral-grid-master skill principle</div>
+      <div class="phil-cycle">
+        <div class="phil-stage" data-s="research">🔬 NGHIÊN CỨU</div>
+        <div class="phil-arrow">→</div>
+        <div class="phil-stage" data-s="experiment">🧪 THÍ NGHIỆM</div>
+        <div class="phil-arrow">→</div>
+        <div class="phil-stage" data-s="package">📦 ĐÓNG GÓI</div>
+        <div class="phil-arrow">→</div>
+        <div class="phil-stage" data-s="transfer">🚀 CHUYỂN GIAO</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ 4-PHASE OVERVIEW ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(6,182,212,0.15); --tag-bd: rgba(6,182,212,0.3); --tag-c: var(--cyan)">
+      <div class="section-tag">Bundle decomposition</div>
+      <div class="section-title">4 phases · 4 sub-skills · 5 JSON outputs</div>
+      <div class="section-desc">
+        Viral Grid Master không phải 1 skill — đó là <b>orchestrator</b> điều phối 4 sub-skill, mỗi skill có 1 trách nhiệm rõ rệt + xuất 1 JSON artifact. Tất cả gom thành 1 <code>master.json</code> + 1 dashboard HTML 5-tab.
+      </div>
+    </div>
+
+    <div class="phase-grid">
+
+      <div class="phase-card" data-p="1">
+        <div class="phase-num">PHASE 1 · RESEARCH</div>
+        <div class="phase-skill">luoi-muc-tieu-builder</div>
+        <div class="phase-title">Lưới Mục Tiêu</div>
+        <div class="phase-desc">Dệt cây từ khóa 4 cấp: Root → Pillar → Branch → Leaf. Mỗi leaf = 1 topic cụ thể có thể sinh content.</div>
+        <div class="phase-out">
+          <div class="phase-out-label">Output JSON</div>
+          <code>keyword-tree.json</code>
+        </div>
+        <div class="phase-out">
+          <div class="phase-out-label">Quy mô</div>
+          <div><span class="phase-num-metric">≥35</span> leaf-keyword</div>
+        </div>
+      </div>
+
+      <div class="phase-card" data-p="2">
+        <div class="phase-num">PHASE 2 · EXPERIMENT</div>
+        <div class="phase-skill">content-vo-han-engine</div>
+        <div class="phase-title">Content Matrix Vô Hạn</div>
+        <div class="phase-desc">Mỗi leaf × format × hook angle = idea. Sinh 300-1000 idea, tỷ lệ <b>60% viral / 40% brand</b>. Kho idea tái sử dụng vô hạn.</div>
+        <div class="phase-out">
+          <div class="phase-out-label">Output JSON</div>
+          <code>content-matrix.json</code>
+        </div>
+        <div class="phase-out">
+          <div class="phase-out-label">Quy mô</div>
+          <div><span class="phase-num-metric">300-1000</span> ideas, ratio 60/40</div>
+        </div>
+      </div>
+
+      <div class="phase-card" data-p="3">
+        <div class="phase-num">PHASE 3 · PACKAGE</div>
+        <div class="phase-skill">visual-dna-designer</div>
+        <div class="phase-title">Visual DNA</div>
+        <div class="phase-desc">9 yếu tố thiết kế + signature: palette · typo · composition · motion · mascot · texture · light · iconography · sound.</div>
+        <div class="phase-out">
+          <div class="phase-out-label">Output JSON</div>
+          <code>visual-dna.json</code>
+        </div>
+        <div class="phase-out">
+          <div class="phase-out-label">Quy mô</div>
+          <div><span class="phase-num-metric">9</span> elements + signature pattern</div>
+        </div>
+      </div>
+
+      <div class="phase-card" data-p="4">
+        <div class="phase-num">PHASE 4 · TRANSFER</div>
+        <div class="phase-skill">viral-hook-execution</div>
+        <div class="phase-title">Execution Plan</div>
+        <div class="phase-desc">30-day calendar + 70 hooks bank + 14 KPI dashboard + 3 SOP cho team. Sẵn sàng chuyển giao cho operator.</div>
+        <div class="phase-out">
+          <div class="phase-out-label">Output JSON</div>
+          <code>execution-plan.json</code>
+        </div>
+        <div class="phase-out">
+          <div class="phase-out-label">Quy mô</div>
+          <div><span class="phase-num-metric">30d · 70h · 14k · 3 SOP</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ BEFORE / AFTER ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(239,68,68,0.15); --tag-bd: rgba(239,68,68,0.3); --tag-c: var(--rose)">
+      <div class="section-tag">Gap analysis</div>
+      <div class="section-title">Trước vs sau tích hợp</div>
+      <div class="section-desc">Pipeline cũ <b>tactical</b> — đi thẳng từ brief vào posts, thiếu strategy layer. Pipeline mới <b>strategic-first</b> — research kỹ → matrix vô hạn → đóng gói DNA → sản xuất + chuyển giao.</div>
+    </div>
+
+    <div class="ba-grid">
+
+      <div class="ba-side ba-before">
+        <div class="ba-tag">CURRENT · V18.1</div>
+        <div class="ba-title">Tactical pipeline</div>
+        <div class="ba-flow">
+          <div class="ba-step weak">1. Brief 1-3 đoạn</div>
+          <div class="ba-step weak">2. create_pack_from_brief()</div>
+          <div class="ba-step weak">3. Gemini analyze brand DNA</div>
+          <div class="ba-step weak">4. Generate 30 posts (no system)</div>
+          <div class="ba-step weak">5. generate_all_images()</div>
+          <div class="ba-step weak">6. schedule_bulk()</div>
+        </div>
+        <div class="ba-flaws">
+          <div class="ba-flaw">Không có keyword tree → topic random</div>
+          <div class="ba-flaw">Không có matrix → idea dùng 1 lần</div>
+          <div class="ba-flaw">Visual ad-hoc, không systematic</div>
+          <div class="ba-flaw">Hết 30 post → cạn ý tưởng</div>
+          <div class="ba-flaw">Không có KPI baseline để đo</div>
+          <div class="ba-flaw">Không có SOP cho team execution</div>
+        </div>
+      </div>
+
+      <div class="ba-arrow-mid">⇒</div>
+
+      <div class="ba-side ba-after">
+        <div class="ba-tag">NEW · V20 STRATEGIC</div>
+        <div class="ba-title">Strategic-first pipeline</div>
+        <div class="ba-flow">
+          <div class="ba-step new">1. Universal Intake (8 câu)</div>
+          <div class="ba-step new">2. run_viral_grid_master() → 4 phases</div>
+          <div class="ba-step new">3. keyword-tree (≥35 leaves)</div>
+          <div class="ba-step new">4. content-matrix (300-1000 ideas)</div>
+          <div class="ba-step new">5. visual-dna (9 yếu tố)</div>
+          <div class="ba-step new">6. execution-plan (30d + 70h + 14k)</div>
+          <div class="ba-step new">7. create_pack_from_strategy(matrix, 30d)</div>
+          <div class="ba-step new">8. generate_all_images(use_dna=true)</div>
+          <div class="ba-step new">9. schedule_bulk(use_calendar=true)</div>
+        </div>
+        <div class="ba-flaws">
+          <div class="ba-win">35+ leaf → topic không bao giờ cạn</div>
+          <div class="ba-win">Matrix 300+ ideas → 10 tháng content</div>
+          <div class="ba-win">Visual DNA → consistency across pack/ads/LP</div>
+          <div class="ba-win">14 KPI predefined → đo viral từ ngày 1</div>
+          <div class="ba-win">3 SOP → team scale không phụ thuộc founder</div>
+          <div class="ba-win">Bidirectional với brand-strategy-engine</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ 7-LAYER NEW ARCHITECTURE ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(245,158,11,0.15); --tag-bd: rgba(245,158,11,0.3); --tag-c: var(--gold)">
+      <div class="section-tag">New 7-Layer stack</div>
+      <div class="section-title">Strategy → Pack → Distribution</div>
+      <div class="section-desc">Thêm <b>3 layer mới phía trên</b> Game of Ecom hiện tại — Intake, Strategy (viral-grid-master), Storage of artifacts. Layers cũ vẫn giữ nguyên, chỉ thay input source.</div>
+    </div>
+
+    <div class="layer-7">
+
+      <div class="layer-row" data-l="0">
+        <div class="lr-num">0</div>
+        <div class="lr-main">
+          <h3>🎯 INTAKE LAYER</h3>
+          <p>1 form duy nhất cho cả pipeline. Có thể import từ brand-strategy-engine.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill new">Universal Intake (8 câu)</span>
+          <span class="lr-pill existing">brand-strategy-engine import (.docx)</span>
+          <span class="lr-pill existing">apify-research-engine (VoC)</span>
+          <span class="lr-pill existing">craw-channel-comments (slang)</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="1">
+        <div class="lr-num">1</div>
+        <div class="lr-main">
+          <h3>🔬 RESEARCH LAYER · luoi-muc-tieu-builder</h3>
+          <p>Phase 1 — Dệt cây từ khóa 4 cấp. Là nền tảng cho mọi content.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill new">Root (brand pillar)</span>
+          <span class="lr-pill new">Pillars (3-5 nhóm)</span>
+          <span class="lr-pill new">Branches (10-15 sub)</span>
+          <span class="lr-pill new">Leaves (≥35 topics)</span>
+          <span class="lr-pill existing">notebooklm (source-grounded research)</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="2">
+        <div class="lr-num">2</div>
+        <div class="lr-main">
+          <h3>🧪 EXPERIMENT LAYER · content-vo-han-engine</h3>
+          <p>Phase 2 — Matrix vô hạn. Leaf × Format × Hook angle = 300-1000 idea.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill new">Idea matrix (viral 60% / brand 40%)</span>
+          <span class="lr-pill new">Format library (image/video/carousel/reel)</span>
+          <span class="lr-pill new">Hook bank (curiosity/pain/social-proof)</span>
+          <span class="lr-pill existing">aff-niche-builder (100 hook ngách)</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="3">
+        <div class="lr-num">3</div>
+        <div class="lr-main">
+          <h3>📦 PACKAGE LAYER · visual-dna-designer</h3>
+          <p>Phase 3 — 9 yếu tố visual + signature pattern. Reused cross channels.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill new">Palette · Typo · Composition</span>
+          <span class="lr-pill new">Motion · Mascot · Texture</span>
+          <span class="lr-pill new">Light · Iconography · Sound</span>
+          <span class="lr-pill existing">mascot-brand-pack (mascot system)</span>
+          <span class="lr-pill existing">image-prompt-master (290+ case)</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="4">
+        <div class="lr-num">4</div>
+        <div class="lr-main">
+          <h3>🚀 TRANSFER LAYER · viral-hook-execution</h3>
+          <p>Phase 4 — Calendar + Hook bank + KPI dashboard + SOP cho operator.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill new">30-day calendar</span>
+          <span class="lr-pill new">70 hook bank</span>
+          <span class="lr-pill new">14 KPI baseline</span>
+          <span class="lr-pill new">3 SOP (capture/produce/publish)</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="5">
+        <div class="lr-num">5</div>
+        <div class="lr-main">
+          <h3>🎮 GoE PACK LAYER (existing)</h3>
+          <p>create_pack_from_strategy() — consumes master.json. Generate cụ thể.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill existing">create_pack_with_vault</span>
+          <span class="lr-pill existing">generate_all_images (uses Visual DNA)</span>
+          <span class="lr-pill existing">generate_all_voices</span>
+          <span class="lr-pill existing">build_render_timeline</span>
+        </div>
+      </div>
+
+      <div class="layer-row" data-l="6">
+        <div class="lr-num">6</div>
+        <div class="lr-main">
+          <h3>📤 DISTRIBUTION LAYER (existing)</h3>
+          <p>Zernio + Meta Ads. Schedule theo calendar, boost theo KPI threshold.</p>
+        </div>
+        <div class="lr-bullets">
+          <span class="lr-pill existing">schedule_bulk (uses calendar)</span>
+          <span class="lr-pill existing">create_meta_ad</span>
+          <span class="lr-pill existing">boost_top_performers (uses 14 KPI)</span>
+          <span class="lr-pill existing">auto_schedule_smart</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ SKILLS NETWORK ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(167,139,250,0.15); --tag-bd: rgba(167,139,250,0.3); --tag-c: var(--purple)">
+      <div class="section-tag">Skills network</div>
+      <div class="section-title">Viral Grid Master là central hub</div>
+      <div class="section-desc">Mọi skill khác trong hệ thống <b>tự động kết nối</b> qua master.json — đầu vào hoặc đầu ra. Đây là điểm tâm nối toàn bộ ecosystem 43+ skills.</div>
+    </div>
+
+    <div class="network-wrap">
+      <svg viewBox="0 0 1200 700" class="net-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hubg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F59E0B"/>
+            <stop offset="50%" stop-color="#EC4899"/>
+            <stop offset="100%" stop-color="#A78BFA"/>
+          </linearGradient>
+          <marker id="netar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/>
+          </marker>
+          <marker id="netar-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#F59E0B"/>
+          </marker>
+        </defs>
+
+        <!-- Central Hub -->
+        <circle cx="600" cy="350" r="100" fill="url(#hubg)" opacity="0.2"/>
+        <circle cx="600" cy="350" r="80" fill="url(#hubg)" opacity="0.4"/>
+        <circle cx="600" cy="350" r="60" fill="url(#hubg)"/>
+        <text x="600" y="340" text-anchor="middle" font-family="Bowlby One" font-size="14" fill="#fff">VIRAL</text>
+        <text x="600" y="358" text-anchor="middle" font-family="Bowlby One" font-size="14" fill="#fff">GRID</text>
+        <text x="600" y="376" text-anchor="middle" font-family="Bowlby One" font-size="10" fill="#fff">master.json</text>
+
+        <!-- UPSTREAM (feed in) — left side -->
+        <text x="180" y="40" text-anchor="middle" font-family="Bowlby One" font-size="14" fill="#06B6D4">⬇ UPSTREAM — feed Intake</text>
+
+        <g class="up-skill">
+          <rect x="60" y="80" width="240" height="50" rx="10" fill="#131A2E" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="180" y="100" text-anchor="middle" font-size="12" fill="#06B6D4" font-family="JetBrains Mono">brand-strategy-engine</text>
+          <text x="180" y="118" text-anchor="middle" font-size="9" fill="#94A3B8">Brand DNA · POP/POD · audience</text>
+        </g>
+
+        <g class="up-skill">
+          <rect x="60" y="150" width="240" height="50" rx="10" fill="#131A2E" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="180" y="170" text-anchor="middle" font-size="12" fill="#06B6D4" font-family="JetBrains Mono">apify-research-engine</text>
+          <text x="180" y="188" text-anchor="middle" font-size="9" fill="#94A3B8">VoC · competitor data · trend</text>
+        </g>
+
+        <g class="up-skill">
+          <rect x="60" y="220" width="240" height="50" rx="10" fill="#131A2E" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="180" y="240" text-anchor="middle" font-size="12" fill="#06B6D4" font-family="JetBrains Mono">craw-channel-comments</text>
+          <text x="180" y="258" text-anchor="middle" font-size="9" fill="#94A3B8">Slang Gen Z · pain points real</text>
+        </g>
+
+        <g class="up-skill">
+          <rect x="60" y="290" width="240" height="50" rx="10" fill="#131A2E" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="180" y="310" text-anchor="middle" font-size="12" fill="#06B6D4" font-family="JetBrains Mono">notebooklm</text>
+          <text x="180" y="328" text-anchor="middle" font-size="9" fill="#94A3B8">Source-grounded knowledge</text>
+        </g>
+
+        <g class="up-skill">
+          <rect x="60" y="360" width="240" height="50" rx="10" fill="#131A2E" stroke="#06B6D4" stroke-width="1.5"/>
+          <text x="180" y="380" text-anchor="middle" font-size="12" fill="#06B6D4" font-family="JetBrains Mono">GoE Vault (V19A1)</text>
+          <text x="180" y="398" text-anchor="middle" font-size="9" fill="#94A3B8">Curriculum · testimonials · docs</text>
+        </g>
+
+        <!-- Lines from upstream to hub -->
+        <path d="M 300 105 Q 450 150 530 350" stroke="#06B6D4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar)"/>
+        <path d="M 300 175 Q 450 220 530 350" stroke="#06B6D4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar)"/>
+        <path d="M 300 245 Q 450 290 530 350" stroke="#06B6D4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar)"/>
+        <path d="M 300 315 Q 450 340 530 350" stroke="#06B6D4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar)"/>
+        <path d="M 300 385 Q 450 380 530 350" stroke="#06B6D4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar)"/>
+
+        <!-- DOWNSTREAM (consume out) — right side -->
+        <text x="1020" y="40" text-anchor="middle" font-family="Bowlby One" font-size="14" fill="#F59E0B">⬇ DOWNSTREAM — consume master.json</text>
+
+        <g class="dn-skill">
+          <rect x="900" y="80" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="100" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">fb-content-30day-pack</text>
+          <text x="1020" y="118" text-anchor="middle" font-size="9" fill="#94A3B8">30 FB posts using matrix</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="150" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="170" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">tiktok-30day-creator-dashboard</text>
+          <text x="1020" y="188" text-anchor="middle" font-size="9" fill="#94A3B8">TikTok pipeline with hooks</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="220" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="240" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">aff-niche-builder</text>
+          <text x="1020" y="258" text-anchor="middle" font-size="9" fill="#94A3B8">Niche channel from leaves</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="290" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="310" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">mascot-brand-pack</text>
+          <text x="1020" y="328" text-anchor="middle" font-size="9" fill="#94A3B8">Mascot from visual-dna</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="360" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="380" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">landing-page-builder</text>
+          <text x="1020" y="398" text-anchor="middle" font-size="9" fill="#94A3B8">LP from matrix + DNA</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="430" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="450" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">dual-line-packaging-engine</text>
+          <text x="1020" y="468" text-anchor="middle" font-size="9" fill="#94A3B8">Packaging from visual DNA</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="500" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="520" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">5 game-aff engines</text>
+          <text x="1020" y="538" text-anchor="middle" font-size="9" fill="#94A3B8">voucher/quiz/memory/wordle/pixel</text>
+        </g>
+
+        <g class="dn-skill">
+          <rect x="900" y="570" width="240" height="50" rx="10" fill="#131A2E" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="1020" y="590" text-anchor="middle" font-size="12" fill="#F59E0B" font-family="JetBrains Mono">GoE create_pack_*</text>
+          <text x="1020" y="608" text-anchor="middle" font-size="9" fill="#94A3B8">Pack execution with strategy</text>
+        </g>
+
+        <!-- Lines from hub to downstream -->
+        <path d="M 670 350 Q 800 150 900 105" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 200 900 175" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 270 900 245" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 320 900 315" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 370 900 385" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 420 900 455" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 470 900 525" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+        <path d="M 670 350 Q 800 510 900 595" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="3 3" marker-end="url(#netar-gold)"/>
+
+        <!-- Legend -->
+        <text x="180" y="500" text-anchor="middle" font-size="10" fill="#64748B" font-style="italic">UPSTREAM: skills cung cấp input cho intake form</text>
+        <text x="1020" y="660" text-anchor="middle" font-size="10" fill="#64748B" font-style="italic">DOWNSTREAM: skills tiêu thụ master.json để sản xuất</text>
+        <text x="600" y="500" text-anchor="middle" font-size="11" fill="#94A3B8">Central hub orchestrator</text>
+        <text x="600" y="520" text-anchor="middle" font-size="9" fill="#64748B">4 sub-skills · 5 JSON outputs · 1 dashboard</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ JSON ARTIFACTS ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(16,185,129,0.15); --tag-bd: rgba(16,185,129,0.3); --tag-c: var(--emerald)">
+      <div class="section-tag">Data contracts</div>
+      <div class="section-title">5 JSON artifacts mới</div>
+      <div class="section-desc">Mỗi sub-skill emit 1 JSON. Tất cả gom thành <code>master.json</code> — đây là <b>contract chính</b> để tất cả skill khác consume. Lưu D1 table mới: <code>viral_grid_sessions</code>.</div>
+    </div>
+
+    <div class="artifacts">
+
+      <div class="artifact">
+        <div class="artifact-icon">🌳</div>
+        <div class="artifact-name">keyword-tree.json</div>
+        <div class="artifact-desc">4-level tree: root → pillars → branches → leaves. Foundation of all content.</div>
+        <div class="artifact-schema">{
+  "root": "men's care",
+  "pillars": [
+    { "name": "Hygiene", "branches": [...] },
+    { "name": "Health", "branches": [...] },
+    ...
+  ],
+  "leaves_count": 35,
+  "type": "ket_hop"
+}</div>
+      </div>
+
+      <div class="artifact">
+        <div class="artifact-icon">📊</div>
+        <div class="artifact-name">content-matrix.json</div>
+        <div class="artifact-desc">300-1000 ideas, each tagged with leaf + format + hook angle + viral/brand ratio.</div>
+        <div class="artifact-schema">{
+  "total": 487,
+  "viral_ratio": 60,
+  "brand_ratio": 40,
+  "ideas": [
+    {
+      "leaf": "bot-ve-sinh-nam",
+      "format": "carousel",
+      "hook": "curiosity_gap",
+      "tier": "viral",
+      "title": "..."
+    }, ...
+  ]
+}</div>
+      </div>
+
+      <div class="artifact">
+        <div class="artifact-icon">🎨</div>
+        <div class="artifact-name">visual-dna.json</div>
+        <div class="artifact-desc">9 design elements + signature pattern. Used by image gen + LP + packaging.</div>
+        <div class="artifact-schema">{
+  "palette": ["#1A2240","#F59E0B",...],
+  "typography": {"display":"Bowlby","body":"Inter"},
+  "composition": "rule_of_thirds",
+  "motion": "smooth_ease_out",
+  "mascot": {...},
+  "texture": "matte_paper",
+  "light": "soft_directional",
+  "iconography": "stroke_2px_rounded",
+  "sound": "ambient_lofi",
+  "signature": "diagonal_orange_strip"
+}</div>
+      </div>
+
+      <div class="artifact">
+        <div class="artifact-icon">📅</div>
+        <div class="artifact-name">execution-plan.json</div>
+        <div class="artifact-desc">30-day calendar + 70 hook bank + 14 KPI + 3 SOP for team handoff.</div>
+        <div class="artifact-schema">{
+  "calendar": [
+    {"day":1,"slot":"09:00","idea_id":"...","format":"reel"},
+    ...
+  ],
+  "hooks": [...70 hooks...],
+  "kpis": [
+    {"name":"reach","baseline":1000,"target":10000},
+    ...14 KPIs...
+  ],
+  "sops": ["capture","produce","publish"]
+}</div>
+      </div>
+
+      <div class="artifact" style="grid-column: span 2; background: linear-gradient(135deg, rgba(245,158,11,0.08), var(--bg-card)); border-color: var(--gold);">
+        <div class="artifact-icon">🌟</div>
+        <div class="artifact-name">master.json (parent)</div>
+        <div class="artifact-desc">Gom tất cả 4 outputs + brand intake + metadata. Đây là <b>contract chính</b> truyền cho mọi downstream skill.</div>
+        <div class="artifact-schema">{
+  "version": "1.0.0",
+  "brand": {...},
+  "phase_1_keyword_tree": { ... },
+  "phase_2_content_matrix": { ... },
+  "phase_3_visual_dna": { ... },
+  "phase_4_execution_plan": { ... },
+  "meta": {
+    "total_leaves": 35,
+    "total_ideas": 487,
+    "viral_ratio": 60,
+    "calendar_days": 30,
+    "hook_count": 70,
+    "kpi_count": 14
+  }
+}</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ NEW MCP TOOLS ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(245,158,11,0.15); --tag-bd: rgba(245,158,11,0.3); --tag-c: var(--gold)">
+      <div class="section-tag">MCP additions</div>
+      <div class="section-title">12 MCP tools mới cần thêm</div>
+      <div class="section-desc">Phase orchestration + bridge giữa viral-grid-master và GoE. Claude qua MCP có thể chạy full strategy + execute end-to-end trong 1 prompt.</div>
+    </div>
+
+    <div class="mcp-new">
+
+      <div class="mcp-tool" data-m="strategy">
+        <div class="mcp-status new">NEW · ORCHESTRATOR</div>
+        <div class="mcp-tool-name">run_viral_grid_master</div>
+        <div class="mcp-tool-desc">🌟 Atomic: chạy full 4-phase pipeline → return master.json. Auto-fill từ brand-strategy-engine nếu pack đã có.</div>
+        <div class="mcp-tool-chain">→ keyword-tree → matrix → dna → execution</div>
+      </div>
+
+      <div class="mcp-tool" data-m="phase">
+        <div class="mcp-status new">NEW · PHASE 1</div>
+        <div class="mcp-tool-name">generate_keyword_tree</div>
+        <div class="mcp-tool-desc">Chạy độc lập Phase 1. Input: intake. Output: keyword-tree.json với ≥35 leaves.</div>
+        <div class="mcp-tool-chain">scope: gen:write · est. 15s</div>
+      </div>
+
+      <div class="mcp-tool" data-m="phase">
+        <div class="mcp-status new">NEW · PHASE 2</div>
+        <div class="mcp-tool-name">generate_content_matrix</div>
+        <div class="mcp-tool-desc">Phase 2 độc lập. Input: keyword_tree + intake. Output: matrix 300-1000 ideas, 60/40 ratio.</div>
+        <div class="mcp-tool-chain">scope: gen:write · est. 30s</div>
+      </div>
+
+      <div class="mcp-tool" data-m="phase">
+        <div class="mcp-status new">NEW · PHASE 3</div>
+        <div class="mcp-tool-name">design_visual_dna</div>
+        <div class="mcp-tool-desc">Phase 3 độc lập. Input: intake + brand. Output: 9 yếu tố visual + signature.</div>
+        <div class="mcp-tool-chain">scope: gen:write · est. 10s</div>
+      </div>
+
+      <div class="mcp-tool" data-m="phase">
+        <div class="mcp-status new">NEW · PHASE 4</div>
+        <div class="mcp-tool-name">build_execution_plan</div>
+        <div class="mcp-tool-desc">Phase 4 độc lập. Input: matrix + dna + tree. Output: calendar + hooks + KPI + SOP.</div>
+        <div class="mcp-tool-chain">scope: gen:write · est. 20s</div>
+      </div>
+
+      <div class="mcp-tool" data-m="bridge">
+        <div class="mcp-status new">NEW · BRIDGE</div>
+        <div class="mcp-tool-name">create_pack_from_strategy</div>
+        <div class="mcp-tool-desc">🌟 Bridge tool: dùng master.json + day window → tạo pack với posts grounded vào matrix + DNA.</div>
+        <div class="mcp-tool-chain">→ pack_id with strategy-driven posts</div>
+      </div>
+
+      <div class="mcp-tool" data-m="bridge">
+        <div class="mcp-status new">NEW · BRIDGE</div>
+        <div class="mcp-tool-name">apply_visual_dna_to_pack</div>
+        <div class="mcp-tool-desc">Inject visual-dna.json vào pack.brand_json + tất cả image_prompts của posts.</div>
+        <div class="mcp-tool-chain">→ updates pack with DNA hints</div>
+      </div>
+
+      <div class="mcp-tool" data-m="bridge">
+        <div class="mcp-status new">NEW · BRIDGE</div>
+        <div class="mcp-tool-name">schedule_from_execution_plan</div>
+        <div class="mcp-tool-desc">Auto-schedule pack posts theo calendar trong execution-plan.json (override best_time).</div>
+        <div class="mcp-tool-chain">scope: publish:write</div>
+      </div>
+
+      <div class="mcp-tool" data-m="strategy">
+        <div class="mcp-status upgrade">UPGRADE</div>
+        <div class="mcp-tool-name">create_pack_with_vault → v2</div>
+        <div class="mcp-tool-desc">Mở rộng: nếu user truyền master_json → grounded gen sẽ dùng matrix + DNA + calendar.</div>
+        <div class="mcp-tool-chain">backwards compat OK</div>
+      </div>
+
+      <div class="mcp-tool" data-m="strategy">
+        <div class="mcp-status new">NEW · QUERY</div>
+        <div class="mcp-tool-name">list_viral_grid_sessions</div>
+        <div class="mcp-tool-desc">List master.json sessions user đã chạy, lưu trong D1 table viral_grid_sessions.</div>
+        <div class="mcp-tool-chain">scope: packs:read</div>
+      </div>
+
+      <div class="mcp-tool" data-m="strategy">
+        <div class="mcp-status new">NEW · QUERY</div>
+        <div class="mcp-tool-name">get_master_strategy</div>
+        <div class="mcp-tool-desc">Đọc 1 session đầy đủ. Dùng để verify trước khi chạy execution.</div>
+        <div class="mcp-tool-chain">returns master.json full</div>
+      </div>
+
+      <div class="mcp-tool" data-m="strategy">
+        <div class="mcp-status new">NEW · EXPORT</div>
+        <div class="mcp-tool-name">render_master_dashboard</div>
+        <div class="mcp-tool-desc">Generate master-dashboard-[brand].html 5-tab. Return public URL.</div>
+        <div class="mcp-tool-chain">→ R2 public URL</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ WORKFLOW SCENARIOS ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(167,139,250,0.15); --tag-bd: rgba(167,139,250,0.3); --tag-c: var(--purple)">
+      <div class="section-tag">End-to-end scenarios</div>
+      <div class="section-title">3 luồng chính sau khi tích hợp</div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-prompt">"Tao có brand men's care, dùng viral-grid-master setup full strategy + execute 30 ngày đầu lên page @ngaistone."</div>
+      <div class="scenario-chain">
+        <div class="chain-step"><div class="chain-tool">run_viral_grid_master</div><div class="chain-result">Intake → 4 phases → master.json (35 leaves, 487 ideas, 9 DNA, 30d calendar)</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">render_master_dashboard</div><div class="chain-result">HTML 5-tab → R2 URL → m review</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">create_pack_from_strategy</div><div class="chain-result">pack_id + 30 posts grounded vào matrix + DNA</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">apply_visual_dna_to_pack</div><div class="chain-result">image_prompts mỗi post chứa palette/composition/signature</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">generate_all_images</div><div class="chain-result">30 ảnh consistent DNA</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">schedule_from_execution_plan</div><div class="chain-result">30 lịch theo calendar</div></div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-prompt">"Pack Testosterone đã hết 30 ngày, dùng matrix vô hạn generate thêm 60 ngày nữa với cùng DNA."</div>
+      <div class="scenario-chain">
+        <div class="chain-step"><div class="chain-tool">get_master_strategy</div><div class="chain-result">Load master.json đã có</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">create_pack_from_strategy</div><div class="chain-result">days_window=31-90 → 60 posts mới từ matrix chưa dùng</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">generate_all_images</div><div class="chain-result">DNA tự inject — 60 ảnh consistent với 30 ảnh cũ</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">schedule_bulk</div><div class="chain-result">60 lịch tiếp theo</div></div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-prompt">"Lấy keyword tree + visual DNA của brand mens-care, dùng skill aff-niche-builder build TikTok channel với 100 hooks."</div>
+      <div class="scenario-chain">
+        <div class="chain-step"><div class="chain-tool">get_master_strategy</div><div class="chain-result">keyword_tree + visual_dna ready</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">aff-niche-builder skill</div><div class="chain-result">Auto-fill từ tree leaves + DNA → 100 hooks + 30-day calendar</div></div>
+        <div class="chain-arrow">→</div>
+        <div class="chain-step"><div class="chain-tool">tiktok-30day-creator-dashboard</div><div class="chain-result">TikTok dashboard deploy Cloudflare</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ROADMAP ═══════════════════════════════════════════ -->
+<section>
+  <div class="container">
+    <div class="section-header" style="--tag-bg: rgba(220,38,38,0.15); --tag-bd: rgba(220,38,38,0.3); --tag-c: var(--crimson)">
+      <div class="section-tag">Implementation plan</div>
+      <div class="section-title">Roadmap V20 · 4 sprints</div>
+      <div class="section-desc">Ship phased — m review từng phase trước khi qua phase tiếp.</div>
+    </div>
+
+    <div class="roadmap-grid">
+
+      <div class="rm-phase" style="--rm-c: var(--cyan); --rm-bg: rgba(6,182,212,0.15)">
+        <div class="rm-tag">SPRINT 1 · BACKEND</div>
+        <div class="rm-title">V20.A — 4 phase MCP tools</div>
+        <div class="rm-meta">Effort ~6h · 4 new tools + 1 D1 table</div>
+        <ul class="rm-list">
+          <li>D1 table <code>viral_grid_sessions</code></li>
+          <li><code>generate_keyword_tree</code> MCP tool</li>
+          <li><code>generate_content_matrix</code> MCP tool</li>
+          <li><code>design_visual_dna</code> MCP tool</li>
+          <li><code>build_execution_plan</code> MCP tool</li>
+          <li>Internal: extract sub-skill prompts từ skill folder</li>
+        </ul>
+      </div>
+
+      <div class="rm-phase" style="--rm-c: var(--purple); --rm-bg: rgba(167,139,250,0.15)">
+        <div class="rm-tag">SPRINT 2 · ORCHESTRATOR</div>
+        <div class="rm-title">V20.B — run_viral_grid_master</div>
+        <div class="rm-meta">Effort ~4h · master tool + dashboard</div>
+        <ul class="rm-list">
+          <li><code>run_viral_grid_master</code> orchestrator tool</li>
+          <li><code>list_viral_grid_sessions</code> + <code>get_master_strategy</code></li>
+          <li><code>render_master_dashboard</code> → R2 URL</li>
+          <li>HTML 5-tab template embed trong Worker</li>
+          <li>Progress streaming via SSE (optional)</li>
+        </ul>
+      </div>
+
+      <div class="rm-phase" style="--rm-c: var(--pink); --rm-bg: rgba(236,72,153,0.15)">
+        <div class="rm-tag">SPRINT 3 · BRIDGE</div>
+        <div class="rm-title">V20.C — GoE integration</div>
+        <div class="rm-meta">Effort ~5h · 3 bridge tools + upgrade</div>
+        <ul class="rm-list">
+          <li><code>create_pack_from_strategy</code> bridge tool</li>
+          <li><code>apply_visual_dna_to_pack</code> bridge tool</li>
+          <li><code>schedule_from_execution_plan</code> bridge tool</li>
+          <li>Upgrade <code>create_pack_with_vault</code> v2 (consume master)</li>
+          <li>Upgrade <code>generate_all_images</code> to use DNA hints</li>
+        </ul>
+      </div>
+
+      <div class="rm-phase" style="--rm-c: var(--gold); --rm-bg: rgba(245,158,11,0.15)">
+        <div class="rm-tag">SPRINT 4 · UI + SKILLS</div>
+        <div class="rm-title">V20.D — Frontend + skills bidir</div>
+        <div class="rm-meta">Effort ~6h · UI mod + skills hooks</div>
+        <ul class="rm-list">
+          <li>Wizard step 0 → option "Run Viral Grid Strategy first"</li>
+          <li>Strategy viewer modal (5-tab dashboard inline)</li>
+          <li>Bidirectional với brand-strategy-engine (import .docx)</li>
+          <li>Bidirectional với aff-niche-builder (export hooks)</li>
+          <li>Documentation page hướng dẫn intake hiệu quả</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="review-card">
+      <h3>⏸ STOP — Review Mode</h3>
+      <p>Đây là <b>pre-execution map</b> để m review. Chưa code gì cả. Sau khi m duyệt approach, t sẽ ship từng sprint theo thứ tự V20.A → B → C → D.</p>
+      <div class="review-options">
+        <div class="review-opt"><b>Option 1</b>Ship hết V20.A→D (~21h)</div>
+        <div class="review-opt"><b>Option 2</b>Chỉ V20.A→B (~10h) — test orchestrator</div>
+        <div class="review-opt"><b>Option 3</b>Edit map trước khi ship</div>
+        <div class="review-opt"><b>Option 4</b>Hold — chạy skill 1 lần thử trước</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div style="font-family: 'Bowlby One'; color: var(--gold); font-size: 18px; margin-bottom: 12px;">🧬 VIRAL GRID × GAME OF ECOM</div>
+    <div>Integration architecture map · Pre-execution review · 2026-05-19</div>
+    <div style="margin-top: 8px; opacity: 0.5">Status: READY TO REVIEW · No code shipped yet · Awaiting m approval</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+name = "fb-pack-studio"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "."
+
+# D1 binding (existing — was set via dashboard, now declared explicitly)
+[[d1_databases]]
+binding = "DB"
+database_name = "fb-pack-studio-db"
+database_id = "e5257ed6-51a9-42cf-8970-eb610fb9291f"
+
+# R2 binding (V12.1 — media staging for Zernio publish)
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "fb-pack-studio-media"
+
+# Note: secrets (GOOGLE_CLIENT_SECRET, FB_APP_SECRET, etc.) and env vars
+# (GOOGLE_CLIENT_ID, FB_APP_ID) remain configured in the Cloudflare dashboard.
+# Only binding-type overrides apply from this file.
