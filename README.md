@@ -9,6 +9,7 @@
 [![Made with Claude](https://img.shields.io/badge/Pair--programmed-Claude-D97757?logo=anthropic&logoColor=white)](https://claude.com/)
 [![Vietnamese](https://img.shields.io/badge/Locale-Vietnamese%20%F0%9F%87%BB%F0%9F%87%B3-DA251D)]()
 [![Single-file](https://img.shields.io/badge/Source-single--file%20HTML-orange)]()
+[![SafeSkill 83/100](https://img.shields.io/badge/SafeSkill-83%2F100_Passes%20with%20Notes-yellow)](https://safeskill.dev/scan/haideman2025-game-of-ecom)
 
 **Live demo (your own):** Deploy to your Cloudflare account in ~10 minutes — see [Quick Start](#quick-start). · **Codebase tour for AI agents:** [AGENTS.md](./AGENTS.md)
 
