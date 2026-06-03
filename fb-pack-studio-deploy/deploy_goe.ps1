@@ -297,7 +297,11 @@ $markers = @(
     'V23.1',
     'postcard-prompt-actions',
     'V23.2',
-    'mobile-toast-shell'
+    'mobile-toast-shell',
+    # V23.3 - Deep Strategy Mode pack-first fallback (safe JSON fetch + local IDB pack)
+    'V23.3',
+    'Deep Strategy Mode (Beta)',
+    'safeJsonFetch'
 )
 foreach ($m in $markers) {
     if ($content -notmatch [regex]::Escape($m)) {
