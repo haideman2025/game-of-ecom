@@ -2244,6 +2244,56 @@ const savePack = async (pack) => {
     return full;
   } catch(e) { console.warn('savePack', e); return null; }
 };
+// V23.3 — Deep Strategy Mode pack-first fallback: safe JSON fetch for /api/viral-grid/* (and any /api/*).
+// Never throws on a non-JSON / HTML / unauthenticated / broken-endpoint response. Returns a normalized
+// result so callers can branch on errorKind and fall back to a local pack instead of surfacing a raw
+// "Unexpected token <" JSON.parse crash to the user.
+// Shape: { ok, status, data, error, errorKind, raw }
+//   errorKind ∈ 'network' | 'unauthorized' | 'route_inactive' | 'schema' | 'parse' | 'api' | 'http' | null
+const safeJsonFetch = async (url, options = {}) => {
+  let resp;
+  try {
+    resp = await fetch(url, options);
+  } catch (e) {
+    return { ok:false, status:0, data:null, error:'Network error: ' + (e?.message || e), errorKind:'network', raw:'' };
+  }
+  const ct = (resp.headers.get('content-type') || '').toLowerCase();
+  let text = '';
+  try { text = await resp.text(); } catch (e) { text = ''; }
+  const trimmed = text.trim();
+  const looksJson = ct.includes('application/json') || /^[{\[]/.test(trimmed);
+  let data = null, parseErr = null;
+  if (looksJson && trimmed) {
+    try { data = JSON.parse(text); } catch (e) { parseErr = e; }
+  }
+  if (resp.ok && data !== null) {
+    return { ok:true, status:resp.status, data, error:null, errorKind:null, raw:text.slice(0,200) };
+  }
+  // ---- classify failure into an actionable kind ----
+  let errorKind = 'http';
+  let error = '';
+  const looksHtml = ct.includes('text/html') || trimmed.startsWith('<');
+  const apiErr = (data && (data.error || data.message)) ? String(data.error || data.message) : '';
+  if (resp.status === 401 || resp.status === 403) {
+    errorKind = 'unauthorized';
+    error = 'Chưa đăng nhập / không đủ quyền (HTTP ' + resp.status + ').';
+  } else if (apiErr && /no such table|d1_error|no column|database|schema|migration/i.test(apiErr)) {
+    errorKind = 'schema';
+    error = 'D1 schema chưa sẵn sàng: ' + apiErr;
+  } else if (looksHtml || resp.status === 404 || resp.status === 501) {
+    errorKind = 'route_inactive';
+    error = 'API route chưa hoạt động (nhận HTML/' + resp.status + ', không phải JSON). Cần deploy qua Cloudflare Pages Functions — static/local server không phục vụ /api/*.';
+  } else if (parseErr) {
+    errorKind = 'parse';
+    error = 'Phản hồi không phải JSON hợp lệ: ' + trimmed.slice(0,150);
+  } else if (apiErr) {
+    errorKind = 'api';
+    error = apiErr;
+  } else {
+    error = 'HTTP ' + resp.status + (trimmed ? ': ' + trimmed.slice(0,150) : '');
+  }
+  return { ok:false, status:resp.status, data, error, errorKind, raw:text.slice(0,200) };
+};
 const loadPack = async (id) => {
   try { return await idbGet(PACK_PREFIX + id); } catch(e) { return null; }
 };
@@ -5348,6 +5398,11 @@ function FBPublishModal({ post, brand, imageB64, onClose, setToast }) {
    V20.D — ViralGridModal: Strategy-first wizard
    Runs run_viral_grid_master MCP-style endpoint → 4-phase strategy.
    Lists past sessions + opens dashboard.
+   V23.3 — Deep Strategy Mode pack-first fallback: user-facing "Deep Strategy Mode (Beta)".
+           All /api/viral-grid/* calls go through safeJsonFetch; persist is best-effort;
+           a cloud save failure (unauth / inactive route / missing schema) always falls back to a
+           local IndexedDB pack so onSessionDone() returns a usable materialized_pack_id whenever
+           posts were generated. Normalized contract: { ok, materialized_pack_id, local_only, warning }.
    ============================================================ */
 function ViralGridModal({ onClose, setToast, onSessionDone, apiKey }) {
   const [sessions, setSessions] = useState([]);
@@ -5623,9 +5678,13 @@ Return JSON ONLY: {
     }
 
     // V21.4 — Always persist whatever we have (even partial)
+    // V23.3 — Deep Strategy Mode pack-first: persist is BEST-EFFORT. A failed / HTML / unauthenticated
+    // persist response must NOT abort the run — we still materialize posts into a (local) pack below so
+    // the user always lands in a usable Pack Workspace.
+    let sessionId = null, dashboardUrl = null, persistWarning = null;
     try {
       setProgress({ phase: 5, text: '💾 Saving session + rendering dashboard...' });
-      const persistResult = await fetch('/api/viral-grid/persist-session', {
+      const persistRes = await safeJsonFetch('/api/viral-grid/persist-session', {
         method: 'POST', credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5637,13 +5696,14 @@ Return JSON ONLY: {
           phase_4_execution_plan: plan
         })
       });
-      if (!persistResult.ok) {
-        const errD = await persistResult.json();
-        throw new Error(errD.error || 'Persist fail');
+      if (persistRes.ok) {
+        sessionId = persistRes.data.session_id;
+        dashboardUrl = persistRes.data.dashboard_url;
+      } else {
+        // Non-fatal: keep going so generated posts still become a local pack.
+        persistWarning = persistRes.error;
+        console.warn('[V23.3] persist-session non-fatal fail:', persistRes.errorKind, persistRes.error);
       }
-      const persistD = await persistResult.json();
-      const sessionId = persistD.session_id;
-      const dashboardUrl = persistD.dashboard_url;
 
       // V21.5 — ALWAYS materialize (browser-side để bypass CF edge geo-block)
       // V22.3 — Full pipeline parity với AI Strategist /generate-posts (first_comment, hashtags, image_direction, aspect_ratio)
@@ -5771,56 +5831,52 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
               product_type: productType,
               grounded_with_vault: groundWithVault
             };
-            const savePackR = await fetch('/api/viral-grid/save-materialized-pack', {
+            // V23.3 — Deep Strategy Mode pack-first: normalize save into "always end with a usable pack".
+            const dateSlug = new Date().toISOString().slice(0,10);
+            const packName = `${brandName} · ${cnt} posts (${dateSlug})`;
+            const localPackPayload = {
+              name: packName,
+              brand: enrichedBrand,
+              posts: expanded,
+              mascotRefs: [],
+              productRefs: [],
+              image_count: 0, audio_count: 0, video_count: 0, scene_count: 0
+            };
+            const saveRes = await safeJsonFetch('/api/viral-grid/save-materialized-pack', {
               method: 'POST', credentials: 'same-origin',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 session_id: sessionId,
-                pack_name: `${brandName} · ${cnt} posts (${new Date().toISOString().slice(0,10)})`,
+                pack_name: packName,
                 brand_with_dna: enrichedBrand,
                 posts: expanded
               })
             });
-            if (savePackR.ok) {
-              const saveD = await savePackR.json();
-              matData = { pack_id: saveD.pack_id, materialized: expanded.length };
-              console.log('[V21.5] Materialized pack saved to cloud:', saveD.pack_id, expanded.length, 'posts');
-              // V22.3 — Also mirror to local IDB so workspace can load immediately without round-trip
+            if (saveRes.ok && saveRes.data?.pack_id) {
+              const cloudId = saveRes.data.pack_id;
+              matData = { pack_id: cloudId, materialized: expanded.length, local_only: false };
+              console.log('[V21.5] Materialized pack saved to cloud:', cloudId, expanded.length, 'posts');
+              // V22.3 — Mirror to local IDB so workspace can load immediately without round-trip.
               try {
-                await savePack({
-                  id: saveD.pack_id,
-                  name: `${brandName} · ${cnt} posts (${new Date().toISOString().slice(0,10)})`,
-                  brand: enrichedBrand,
-                  posts: expanded,
-                  mascotRefs: [],
-                  productRefs: [],
-                  image_count: 0, audio_count: 0, video_count: 0, scene_count: 0
-                });
+                await savePack({ id: cloudId, ...localPackPayload });
                 console.log('[V22.3] Mirrored materialized pack to local IDB');
               } catch (e) { console.warn('[V22.3] Local mirror failed:', e.message); }
-            } else if (savePackR.status === 401) {
-              // V22.3 — User not signed in to Google: save to local IDB only
-              const localId = `pk-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
-              try {
-                await savePack({
-                  id: localId,
-                  name: `${brandName} · ${cnt} posts (local · ${new Date().toISOString().slice(0,10)})`,
-                  brand: enrichedBrand,
-                  posts: expanded,
-                  mascotRefs: [],
-                  productRefs: [],
-                  image_count: 0, audio_count: 0, video_count: 0, scene_count: 0
-                });
-                matData = { pack_id: localId, materialized: expanded.length, local_only: true };
-                console.log('[V22.3] Saved to local IDB only (not signed in):', localId, expanded.length, 'posts');
-              } catch (e) {
-                console.error('[V22.3] Local save fail:', e);
-                throw new Error('Local IDB save fail: ' + e.message);
-              }
             } else {
-              const errTxt = await savePackR.text();
-              console.error('[Save pack failed]', savePackR.status, errTxt);
-              throw new Error(`Save pack ${savePackR.status}: ${errTxt.slice(0,200)}`);
+              // V23.3 — Cloud save failed for ANY reason (unauthorized, route inactive / HTML,
+              // missing D1 schema, parse, network, http). Generated posts must never be lost —
+              // always create a local IndexedDB pack so the user lands in a usable workspace.
+              const localId = `pk-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
+              await savePack({ ...localPackPayload, id: localId, name: `${packName} · local` });
+              matData = { pack_id: localId, materialized: expanded.length, local_only: true, warning: saveRes.error };
+              const kindMsg = saveRes.errorKind === 'unauthorized'
+                ? 'Chưa đăng nhập Google — đã tạo local pack. Cloud sync sẽ retry khi đăng nhập.'
+                : saveRes.errorKind === 'route_inactive'
+                ? 'API chưa active (cần deploy Cloudflare Pages Functions) — đã tạo local pack.'
+                : saveRes.errorKind === 'schema'
+                ? 'D1 schema thiếu — đã tạo local pack. Apply migration để sync lên cloud.'
+                : 'Cloud save lỗi — đã tạo local pack. (' + (saveRes.error || 'unknown') + ')';
+              console.warn('[V23.3] Cloud save fail → local fallback pack:', localId, saveRes.errorKind, saveRes.error);
+              setToast?.({ type:'warn', msg:'📂 ' + kindMsg, duration: 12000 });
             }
           }
         } catch (e) {
@@ -5832,7 +5888,7 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
       setShowForm(false);
       const successCount = phaseLog.filter(p => p.status === 'ok').length;
       const xpReward = (runFullGenesis ? 300 : 150) * (successCount / 4);
-      try { awardXP(Math.floor(xpReward), `🌟 Brand Genesis: ${successCount}/4 phases`); } catch (e) {}
+      try { awardXP(Math.floor(xpReward), `🌟 Deep Strategy Mode: ${successCount}/4 phases`); } catch (e) {}
       const msgParts = [];
       if (tree?.stats?.total_leaves) msgParts.push(`${tree.stats.total_leaves} leaves`);
       if (matrix?.total) msgParts.push(`${matrix.total} ideas`);
@@ -5847,10 +5903,20 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
       setToast?.({ type: failedPhases.length ? 'warn' : 'success', msg: msgFinal, duration: 15000 });
       await loadSessions();
       if (dashboardUrl) window.open(dashboardUrl, '_blank', 'noopener');
-      onSessionDone?.({ session_id: sessionId, dashboard_url: dashboardUrl, materialized_pack_id: matData?.pack_id, phaseLog });
+      // V23.3 — Normalized pack-first contract: callers always get a usable materialized_pack_id
+      // whenever posts were generated (cloud OR local fallback), plus local_only + warning flags.
+      onSessionDone?.({
+        ok: true,
+        session_id: sessionId,
+        dashboard_url: dashboardUrl,
+        materialized_pack_id: matData?.pack_id || null,
+        local_only: matData?.local_only || false,
+        warning: matData?.warning || persistWarning || null,
+        phaseLog
+      });
     } catch (e) {
-      console.error('[Persist/Materialize fail]', e, { phaseLog });
-      setToast?.({ type: 'error', msg: 'Persist fail: ' + e.message.slice(0, 200) + ' — Phase results: ' + JSON.stringify(phaseLog), duration: 15000 });
+      console.error('[V23.3 Persist/Materialize fail]', e, { phaseLog });
+      setToast?.({ type: 'error', msg: 'Deep Strategy Mode fail: ' + e.message.slice(0, 200) + ' — Phase results: ' + JSON.stringify(phaseLog), duration: 15000 });
     } finally { setRunning(false); }
   };
 
@@ -5862,8 +5928,8 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
         <div className="p-5 rounded-t-2xl text-white" style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #EC4899 50%, #A78BFA 100%)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-bold opacity-90">🌟 VIRAL GRID MASTER · V20</div>
-              <div className="text-xl font-black">Strategy-First Pipeline</div>
+              <div className="text-[10px] font-bold opacity-90">🌟 DEEP STRATEGY MODE · BETA · V23.3</div>
+              <div className="text-xl font-black">Deep Strategy Mode (Beta)</div>
               <div className="text-[11px] opacity-90 mt-0.5">Research → Experiment → Package → Transfer · 4 phases · 300+ ideas · Visual DNA · 30d calendar</div>
             </div>
             <button onClick={onClose} className="text-2xl hover:opacity-70">×</button>
@@ -5964,7 +6030,7 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
               <div className="mb-3">
                 <button onClick={() => setShowForm(false)} className="text-xs text-gray-500 hover:text-gray-700">← Back to sessions</button>
               </div>
-              <div className="text-sm font-bold mb-3">🎯 Universal Intake — 10 câu (V21 Brand Genesis)</div>
+              <div className="text-sm font-bold mb-3">🎯 Universal Intake — 10 câu (Deep Strategy Mode)</div>
 
               {/* V21.1 — Upload strategy file for auto-fill */}
               <div className="mb-3 rounded-xl p-3" style={{background:'linear-gradient(135deg,rgba(6,182,212,0.08),rgba(167,139,250,0.08))', border:'2px dashed rgba(6,182,212,0.3)'}}>
@@ -5992,7 +6058,7 @@ Return JSON: {"posts":[{"n":${bi+1},"title":"","caption":"","image_prompt":"","i
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input type="checkbox" checked={runFullGenesis} onChange={e=>setRunFullGenesis(e.target.checked)} className="mt-1 w-4 h-4"/>
                   <div>
-                    <div className="font-bold text-sm" style={{color:'#B45309'}}>🌟 Full Brand Genesis Mode</div>
+                    <div className="font-bold text-sm" style={{color:'#B45309'}}>🌟 Full Deep Strategy Mode</div>
                     <div className="text-[11px] text-gray-700 mt-1">
                       {runFullGenesis
                         ? '✅ Chạy 6 phases: Research → Experiment → Package → Transfer → MATERIALIZE 100 posts → ROUTE SKILLS. ~3-5 phút.'
@@ -6640,7 +6706,7 @@ function WelcomeScreen({ onLoadDemo, onStartWizard, onPasteJSON, onSettings, has
               style={{borderColor:'#A78BFA'}}>
               <span className="text-2xl">🌟</span>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm" style={{color:'#7C3AED'}}>Brand Genesis Lab <span className="text-[9px] font-normal bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded ml-1">ADVANCED · STRATEGY-FIRST</span></div>
+                <div className="font-bold text-sm" style={{color:'#7C3AED'}}>Deep Strategy Mode <span className="text-[9px] font-normal bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded ml-1">BETA · ADVANCED</span></div>
                 <div className="text-[11px] text-gray-600 leading-snug">Advanced only: upload file chiến lược → research sâu trước khi tạo pack. P0 user mới nên mở Demo Pack hoặc dùng Wizard text-first trước.</div>
               </div>
               <span className="text-purple-500 group-hover:translate-x-1 transition-transform">→</span>
@@ -9786,7 +9852,7 @@ function AppHeader({ brandName, onSettings, onNewPack, hasApiKey, onExport, canE
         {onOpenViralGrid && (
           <button onClick={onOpenViralGrid} className="btn-ghost text-sm flex items-center gap-1.5 font-bold goe-pulse" title="Viral Grid Master — 4-phase strategy (keyword tree → matrix → DNA → execution)" style={{background:'linear-gradient(135deg,rgba(245,158,11,0.15),rgba(236,72,153,0.15))', borderColor:'#F59E0B', color:'#B45309'}}>
             <span>🌟</span>
-            <span className="hidden md:inline">Brand Genesis</span>
+            <span className="hidden md:inline">Deep Strategy</span>
           </button>
         )}
         {/* V14.35 — Meta Ads Manager (via Zernio) — V14.35.1 always visible (modal handles not-connected) */}
@@ -20653,9 +20719,12 @@ function App() {
       {showProduction && <VoiceProductionModal post={productionPost || posts[0]} apiKey={apiKey} brand={brand} onClose={()=>{setShowProduction(false); setProductionPost(null);}} setToast={setToast} />}
       {/* V20 — Viral Grid Master strategy */}
       {showViralGrid && <ViralGridModal apiKey={apiKey} onClose={()=>setShowViralGrid(false)} setToast={setToast} onSessionDone={async (d)=>{
-        // V21.5 — Auto-open materialized pack in workspace (push data into Brand Setup UI)
+        // V21.5 / V23.3 — Deep Strategy Mode pack-first: always open the materialized pack
+        // (cloud OR local fallback) in the workspace whenever posts were generated.
         if (d.materialized_pack_id) {
-          setToast({type:'success', msg:`🌟 Strategy + 100 posts ready! Đang mở pack vào workspace...`, duration: 8000});
+          setToast({ type: d.local_only ? 'warn' : 'success', msg: d.local_only
+            ? `📂 Deep Strategy Mode: đã tạo local pack (cloud sync pending) — đang mở workspace...`
+            : `🌟 Deep Strategy Mode: strategy + posts ready! Đang mở pack vào workspace...`, duration: 8000 });
           setShowViralGrid(false);
           // Refresh packs list + open the new pack
           try {
@@ -20664,7 +20733,10 @@ function App() {
           } catch(e){}
           await handleOpenPack(d.materialized_pack_id);
         } else if (d.session_id) {
-          setToast({type:'warn', msg:`Strategy done nhưng chưa materialize pack. Gọi materialize_top_posts(session_id=${d.session_id.slice(0,8)}) từ MCP để tạo pack.`, duration: 12000});
+          // Strategy artifact saved but no posts were materialized (e.g. 0 ideas) — nothing to open.
+          setToast({type:'warn', msg:`Strategy đã lưu nhưng chưa có post để tạo pack. Chạy lại với Full Mode để materialize posts.`, duration: 12000});
+        } else {
+          setToast({type:'error', msg: d.warning ? ('Deep Strategy Mode lỗi: ' + d.warning) : 'Deep Strategy Mode không tạo được pack.', duration: 12000});
         }
       }} />}
       {showFBConnect && <FBConnectModal onClose={()=>setShowFBConnect(false)} setToast={setToast} onConnected={()=>{ fetch('/api/fb/status', {credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(setFBStatus); }} />}
