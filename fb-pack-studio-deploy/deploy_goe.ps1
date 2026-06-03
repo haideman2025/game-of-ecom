@@ -283,7 +283,21 @@ $markers = @(
     '/api/production/render-pack-html',
     'VO Pack',
     'gemini-omni-flash',
-    'Nano Banana Pro 3'
+    'Nano Banana Pro 3',
+    # V22.9 - Director-grade 8-frame storyboard
+    'V22.9',
+    'Director 8-Frame Breakdown',
+    'AUTHORITATIVE 8-BEAT TIMELINE',
+    # V23.0 - Mobile command center UX
+    'V23.0',
+    'Mobile command center UX',
+    'welcome-onboarding-card',
+    'mobile-mode-strip',
+    # V23.1/V23.2 - Mobile overflow + toast-fit polish
+    'V23.1',
+    'postcard-prompt-actions',
+    'V23.2',
+    'mobile-toast-shell'
 )
 foreach ($m in $markers) {
     if ($content -notmatch [regex]::Escape($m)) {

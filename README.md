@@ -14,6 +14,30 @@
 
 ---
 
+## MVP P0 flow
+
+For the first public MVP, the recommended new-user flow is **demo-first, text-first**. A new user should be able to open the app, click **Open Demo 30-Day Pack**, inspect a complete ONIIZ sample workspace, and understand the core value before adding a Gemini API key, Vault documents, publishing integrations, or media generation.
+
+| Step | User outcome |
+|---|---|
+| 1. Open demo pack | See a complete 30-day content pack immediately, without API key or login. |
+| 2. Review workspace | Inspect brand DNA, captions, image prompts, hashtags, and first comments. |
+| 3. Create own text-first pack | Use AI Strategy Wizard only when ready to add an API key. |
+| 4. Generate media later | Produce images/video/publishing automation after the text pack is validated. |
+
+## What it does
+
+- **Demo pack → instant workspace**: open a ready-made 30-day pack without API key, Vault, media, login, or integrations
+- **Wizard → 30-day pack**: brand intake → AI Strategist generates 30 daily posts (caption + image prompt + first comment + hashtags) grounded in optional vault documents
+- **AI image generation**: Gemini 2.5 Flash Image / Nano Banana Pro 3 with mascot + product reference continuity
+- **Voice-over**: Gemini TTS (30 Vietnamese voices) with auto-pacing
+- **Storyboard pipeline**: voice → 10s scenes → 8-frame hand-drawn breakdown → Omni Flash 10s video clips with character lock
+- **Video Studio**: WebCodecs MP4 export, CapCut-style timeline, Ken Burns, subtitles, BGM picker
+- **Brand Genesis Lab** (advanced): 4-phase research engine producing keyword tree → content matrix (300+ ideas) → visual DNA → 30/90-day execution plan
+- **MCP server**: 50+ tools so Claude/Cowork/Claude Code can run the whole flow over JSON-RPC + OAuth 2.1
+- **Publishing**: Zernio integration (Facebook/TikTok scheduling) + Meta Marketing API native (campaigns/adsets/ads)
+- **Quest/XP system**: gamified onboarding, daily quests, badges, leaderboard
+
 ## What is Game of Ecom?
 
 Game of Ecom is an end-to-end content production studio purpose-built for Vietnamese e-commerce sellers and AI-curious solopreneurs. You input a brand idea (or upload a strategy doc). It returns:
@@ -170,6 +194,21 @@ Then in the Cloudflare dashboard set these environment variables (Pages → Sett
 | `META_APP_SECRET` | secret | Optional | Meta Marketing API |
 
 Open the deployed URL, click **Settings** → paste your **Gemini API key** (get one at https://aistudio.google.com/apikey — make sure Generative Language API is enabled), sign in with Google, click **🧙 AI Strategy Wizard**, fill brand info, click **Generate**. Done.
+
+7. **First-time use**
+   - Open the deployed URL
+   - Click **Open Demo 30-Day Pack** to inspect the complete sample workspace immediately
+   - Optional: Settings → set Gemini API key when you want to generate a new pack
+   - Optional: sign in with Google for cloud sync + Drive
+   - Welcome → AI Strategy Wizard → fill brand → generate a text-first 30-day pack, then create media later
+
+8. **Validate before deploy**
+   ```bash
+   npm install
+   npm run validate
+   ```
+
+   The validation scripts parse the single-file React/Babel app and all Cloudflare Pages Functions before deployment.
 
 ### Optional: bundle free background music
 

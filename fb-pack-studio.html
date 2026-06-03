@@ -277,6 +277,46 @@
     animation: slideUp 0.25s ease-out;
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  /* V23.0 — Mobile command center UX: prevent horizontal clipping, strengthen touch hierarchy, and make first-run sheets phone-safe. */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .mobile-app-shell { width: 100%; max-width: 100vw; }
+  .mobile-mode-strip { display: none; }
+  @media (max-width: 767px) {
+    .mobile-app-shell { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+    .mobile-app-header { top: 0; }
+    .mobile-app-header .btn-ghost { min-height: 42px; padding-left: 0.7rem; padding-right: 0.7rem; }
+    .mobile-header-title { max-width: 148px; }
+    .mobile-action-sheet { position: fixed !important; left: 0.75rem !important; right: 0.75rem !important; bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) !important; top: auto !important; width: auto !important; max-height: min(76vh, 620px); border-radius: 24px; }
+    .mobile-action-scrim { background: rgba(15, 10, 5, 0.22); backdrop-filter: blur(2px); }
+    .mobile-mode-strip { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0.5rem 0 0.75rem; padding: 0.8rem 0.9rem; border-radius: 18px; background: rgba(255,255,255,0.88); border: 1px solid rgba(255,255,255,0.72); box-shadow: var(--shadow-clay-sm); }
+    .mobile-bottom-nav { padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px)); border-top-left-radius: 18px; border-top-right-radius: 18px; }
+    .mobile-bottom-nav button { min-height: 62px; }
+    .mobile-bottom-nav .active-mobile-tab { background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(99,102,241,0.14)); color: #4f46e5; }
+    .welcome-screen-wrap { align-items: flex-start !important; padding: 0.85rem !important; }
+    .welcome-screen-card { padding: 1rem !important; border-radius: 22px !important; }
+    .welcome-screen-primary { padding: 1rem !important; }
+    .welcome-onboarding-backdrop { align-items: flex-end !important; justify-content: center !important; padding: 0.5rem !important; }
+    .welcome-onboarding-card { width: 100% !important; max-width: calc(100vw - 1rem) !important; max-height: calc(100dvh - 1rem) !important; border-radius: 24px !important; overflow-x: hidden !important; overflow-y: auto !important; box-sizing: border-box; }
+    .welcome-onboarding-card *, .welcome-onboarding-card *::before, .welcome-onboarding-card *::after { box-sizing: border-box; min-width: 0; max-width: 100%; }
+    .welcome-onboarding-card p, .welcome-onboarding-card div, .welcome-onboarding-card li, .welcome-onboarding-card b { overflow-wrap: anywhere; word-break: normal; }
+    .welcome-onboarding-banner { padding: 1rem 1rem 0.9rem !important; overflow: hidden !important; }
+    .welcome-onboarding-banner p { font-size: 0.8rem !important; line-height: 1.3 !important; }
+    .welcome-onboarding-title { font-size: 1.95rem !important; line-height: 1 !important; }
+    .welcome-onboarding-icon { font-size: 3rem !important; margin-bottom: 0.35rem !important; }
+    .welcome-onboarding-body { padding: 1rem !important; gap: 0.75rem !important; overflow-x: hidden !important; }
+    .welcome-onboarding-actions { flex-direction: column !important; }
+    .welcome-onboarding-actions .goe-btn { width: 100%; justify-content: center; min-height: 46px; }
+    /* V23.1 — PostCard action rows wrap safely on phone screens. */
+    .postcard-prompt-summary { align-items: flex-start !important; justify-content: flex-start !important; gap: 0.45rem !important; }
+    .postcard-prompt-actions { display: flex !important; flex-wrap: wrap !important; gap: 0.35rem 0.45rem !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; overflow-x: hidden !important; }
+    .postcard-prompt-actions button, .postcard-prompt-actions select { min-height: 32px; max-width: 100%; white-space: normal; overflow-wrap: anywhere; line-height: 1.15; }
+    .postcard-prompt-actions select { flex: 1 1 120px; }
+    /* V23.2 — Mobile toast-fit keeps success/error feedback usable without blocking the active pane. */
+    .mobile-toast-shell { top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important; left: 0.75rem !important; right: 0.75rem !important; transform: none !important; }
+    .mobile-toast-card { width: 100%; max-width: 100% !important; align-items: flex-start; border-radius: 18px !important; padding: 0.75rem 0.85rem !important; font-size: 0.92rem !important; line-height: 1.35 !important; }
+    .mobile-toast-message { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-width: 0; }
+    .mobile-hide-fab { display: none !important; }
+  }
   /* PreviewPane fullscreen overlay */
   .preview-fullscreen {
     position: fixed; inset: 0; z-index: 60;
@@ -2369,10 +2409,10 @@ function Toast({ toast, onClose }) {
   };
   const grad = colors[toast.type] || colors.info;
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] toast-pop">
-      <div className={`bg-gradient-to-r ${grad} text-white px-5 py-3 rounded-xl shadow-2xl font-medium flex items-center gap-3 max-w-md`}>
-        <span>{toast.msg}</span>
-        <button onClick={onClose} className="text-white/80 hover:text-white ml-2">×</button>
+    <div className="mobile-toast-shell fixed top-4 left-1/2 -translate-x-1/2 z-[100] toast-pop">
+      <div className={`mobile-toast-card bg-gradient-to-r ${grad} text-white px-5 py-3 rounded-xl shadow-2xl font-medium flex items-center gap-3 max-w-md`}>
+        <span className="mobile-toast-message">{toast.msg}</span>
+        <button onClick={onClose} className="text-white/80 hover:text-white ml-2 shrink-0">×</button>
       </div>
     </div>
   );
@@ -3043,6 +3083,7 @@ async function geminiGenerateAudio(apiKey, text, voiceName, opts) {
 /* V22.8 — Storyboard planner: break script into max-10s scenes (Omni Flash native duration)
    matching the actual voice-over duration. Returns { scenes: [{n, start_s, end_s,
    shot_type, action, visual_description, image_prompt}], total_duration }. */
+// V22.9 — Director-grade 8-frame storyboard upgrade: richer scene schema, readable frame packs, authoritative Omni blueprint.
 async function geminiPlanStoryboard(apiKey, scriptText, durationSec, ctx) {
   // V22.8 — Default chunk = 10s per scene (Omni Flash sweet spot, 8-frame breakdown)
   const SCENE_CHUNK_SEC = 10;
@@ -3094,6 +3135,12 @@ HARD CONSTRAINTS
 
 5. ASPECT RATIO ENFORCEMENT: every image_prompt MUST end with "Aspect ratio: ${aspect}. Composition framed for ${aspect}." — do not omit.
 
+6. V22.9 DIRECTOR-GRADE 8-FRAME LOGIC: every scene is a self-contained 10s cinematic clip split into exactly 8 connected beats. Beat 1 must establish the starting state, beats 2-4 develop motion, beats 5-6 create the emotional/product peak, beat 7 shows payoff, beat 8 resolves and prepares the next scene. The 8 beats must be interpolatable — each beat changes subject pose, camera position, prop state, or composition.
+
+7. VOICE + TEXT CLARITY: write voice_over_text for the whole scene and 8 beat-level voice_over_text lines. Each beat-level VO line must be short enough for ~1.25s natural Vietnamese speech (roughly 3-7 Vietnamese words). Write on_screen_text only when it helps the ad; keep it large, exact, and minimal.
+
+8. SCENE-TO-SCENE BRIDGE: every scene except the last must explicitly describe how its final frame prepares the next scene via next_scene_bridge. Use inter_scene_boundary = "continuous" when the next scene reuses a visual state, otherwise "scene_cut" with a motivated cinematic cut.
+
 ═══════════════════════════════════════
 DELIVERABLE
 ═══════════════════════════════════════
@@ -3102,13 +3149,26 @@ Produce exactly ${sceneCount} scenes (max 10s each, total = ${durationSec.toFixe
 Each scene object:
 - n: scene number (1-${sceneCount})
 - start_s, end_s: timeline in seconds (cumulative, sum = ${durationSec.toFixed(1)})
+- duration_s: exact scene duration in seconds; default 10 except final remainder
+- narrative_purpose: one of [establish, develop, climax, resolve, transition, product_shot, reaction, insert]
 - shot_type: one of [WIDE, MEDIUM, CLOSE_UP, EXTREME_CLOSE_UP, OVER_SHOULDER, POV, INSERT]
-- action: 1-line verb-driven beat (what happens here, in Vietnamese OK) — MUST be 12-30 words (V22.8 expanded for 10s scenes)
-- visual_description: 3-5 sentence cinematic English description connecting to the previous scene — MUST be 40-90 words total (V22.8 word-cap for 10s pacing)
-- image_prompt: Nano Banana Pro 3 full prompt — MUST be 60-120 words total. Required components: (a) subject + action, (b) explicit mention "match the previous scene's character design and color palette exactly", (c) lighting/mood, (d) "Aspect ratio: ${aspect}. Composition framed for ${aspect}." Keep concise — every word counts toward the limit.
+- camera_movement: one of [static, slow_push_in, dolly_in, dolly_out, pan_left, pan_right, tilt_up, tilt_down, handheld_follow, arc, rack_focus]
+- action: 1-line verb-driven beat (what happens here, Vietnamese OK) — 12-30 words
+- visual_description: 3-5 sentence cinematic English description connecting to the previous scene — 40-110 words
+- transition_description: 2-4 sentences explaining how motion evolves from first keyframe to last keyframe. Must include subject appearance, movement trajectory, state changes, and what remains present throughout.
+- first_keyframe: concise visual state at second 0.00 of this scene; must be concrete and drawable
+- last_keyframe: concise visual state at scene end; must differ from first_keyframe through pose/action/position/composition, not only lighting
+- voice_over_text: full scene VO in ${ctx?.brandLanguage || 'Vietnamese'}; natural, concise, fits within duration_s
+- on_screen_text: exact overlay text if needed, otherwise "". Keep under 8 words and write it as it should appear.
+- bgm_cue: music mood + arrangement arc for this scene
+- sfx_cue: 1-3 practical sound effects tied to visible actions, or "none"
+- inter_scene_boundary: "continuous" or "scene_cut"
+- next_scene_bridge: if not final scene, describe how beat 8 visually motivates scene n+1; if final scene, describe final CTA/settle
+- frame_beats: EXACTLY 8 objects. Each object has {panel, start_s, end_s, beat, narrative_purpose, shot_type, camera_movement, visual_action, transition_to_next, voice_over_text, on_screen_text, bgm_cue, sfx_cue}. Beat names must be exactly HOOK, SETUP, INTRO, INTERACTION, RISING, CLIMAX, RELEASE, RESOLUTION.
+- image_prompt: Nano Banana Pro 3 full prompt — 70-150 words total. Required components: (a) subject + action, (b) explicit mention "match the previous scene's character design and color palette exactly", (c) lighting/mood, (d) camera/framing, (e) "Aspect ratio: ${aspect}. Composition framed for ${aspect}." Keep concise.
 
-V22.8 — WORD CAP RATIONALE (10s Omni Flash pattern):
-Each scene = 10s video = 8 micro-beats at ~1.25s each. Prompts need more breathing room than 4s scenes but still concise enough that the 8-beat storyboard pack image can break it down clearly. Violate these caps and the system will retry — wasting your quota.
+V22.9 — DIRECTOR-GRADE 10s OMNI FLASH PATTERN:
+Each scene = 10s video = 8 micro-beats at ~1.25s each. The JSON must be useful even if the storyboard image OCR is imperfect: frame_beats becomes the authoritative text blueprint for Omni Flash, while the 2×4 sheet is only a visual reference. Prioritize smooth motion, readable VO, and a motivated bridge into the next scene.
 
 Output ONLY a valid JSON object: {"total_duration": ${durationSec.toFixed(1)}, "scene_count": ${sceneCount}, "aspect_ratio": "${aspect}", "narrative_arc": "<1-sentence summary of the 3-beat>", "scenes": [...]}. NO narration outside the JSON.`;
 
@@ -3137,22 +3197,63 @@ Output ONLY a valid JSON object: {"total_duration": ${durationSec.toFixed(1)}, "
     }
   }
   if (!Array.isArray(parsed.scenes)) throw new Error('Storyboard response missing scenes[]');
-  // V14.30 — Post-validate word caps (warn, don't reject — Gemini sometimes overshoots but result is usable)
+  // V22.9 — Post-validate director-grade storyboard fields (warn, don't reject — usable output beats quota waste)
   const wordCount = s => (s || '').trim().split(/\s+/).filter(Boolean).length;
   const violations = [];
   parsed.scenes.forEach((sc, i) => {
     const aW = wordCount(sc.action);
     const vW = wordCount(sc.visual_description);
     const pW = wordCount(sc.image_prompt);
-    if (aW < 4 || aW > 22) violations.push(`#${i+1} action=${aW}w`);
-    if (vW < 15 || vW > 60) violations.push(`#${i+1} visual=${vW}w`);
-    if (pW < 30 || pW > 100) violations.push(`#${i+1} prompt=${pW}w`);
+    if (aW < 4 || aW > 35) violations.push(`#${i+1} action=${aW}w`);
+    if (vW < 15 || vW > 120) violations.push(`#${i+1} visual=${vW}w`);
+    if (pW < 30 || pW > 170) violations.push(`#${i+1} prompt=${pW}w`);
+    if (Array.isArray(sc.frame_beats) && sc.frame_beats.length !== 8) violations.push(`#${i+1} frame_beats=${sc.frame_beats.length}`);
+    if (!sc.transition_description) violations.push(`#${i+1} missing transition_description`);
+    if (!sc.voice_over_text && !sc.frame_beats?.some(b => b.voice_over_text)) violations.push(`#${i+1} missing VO`);
   });
   if (violations.length > 0) {
     console.warn('[V14.30 word-cap] Soft violations (proceeding anyway):', violations.slice(0,5).join(', '));
     parsed._wordCapViolations = violations;
   }
   return parsed;
+}
+
+// V22.9 — Persist director-grade storyboard metadata so Frame Pack + Omni prompt can stay precise even after reload.
+function buildStoryboardSceneMeta(sc = {}) {
+  const duration = Number(sc.duration_s || sc.duration || ((Number(sc.end_s) || 0) - (Number(sc.start_s) || 0))) || 10;
+  const frameBeats = Array.isArray(sc.frame_beats) ? sc.frame_beats.slice(0, 8).map((b, i) => ({
+    panel: b.panel || i + 1,
+    start_s: b.start_s,
+    end_s: b.end_s,
+    beat: b.beat || ['HOOK','SETUP','INTRO','INTERACTION','RISING','CLIMAX','RELEASE','RESOLUTION'][i],
+    narrative_purpose: b.narrative_purpose || '',
+    shot_type: b.shot_type || sc.shot_type || '',
+    camera_movement: b.camera_movement || sc.camera_movement || '',
+    visual_action: b.visual_action || b.visual_description || '',
+    transition_to_next: b.transition_to_next || '',
+    voice_over_text: b.voice_over_text || '',
+    on_screen_text: b.on_screen_text || '',
+    bgm_cue: b.bgm_cue || sc.bgm_cue || '',
+    sfx_cue: b.sfx_cue || sc.sfx_cue || ''
+  })) : [];
+  return {
+    duration,
+    duration_s: duration,
+    shot_type: sc.shot_type || '',
+    visual_description: sc.visual_description || '',
+    narrative_purpose: sc.narrative_purpose || '',
+    camera_movement: sc.camera_movement || '',
+    transition_description: sc.transition_description || '',
+    first_keyframe: sc.first_keyframe || sc.first_keyframe_visible_content || '',
+    last_keyframe: sc.last_keyframe || sc.last_keyframe_visible_content || '',
+    voice_over_text: sc.voice_over_text || sc.narration_cue || '',
+    on_screen_text: sc.on_screen_text || '',
+    bgm_cue: sc.bgm_cue || '',
+    sfx_cue: sc.sfx_cue || '',
+    inter_scene_boundary: sc.inter_scene_boundary || 'scene_cut',
+    next_scene_bridge: sc.next_scene_bridge || '',
+    frame_beats: frameBeats
+  };
 }
 
 /* Scene image — chain continuity: previous scene image is the FIRST reference,
@@ -4241,7 +4342,7 @@ function CreateAdModal({ post, scheduledPost, packId, brand, generatedImageB64, 
             <button onClick={handleExportConfig} disabled={!primaryText.trim() || !mediaUrl} className="goe-btn goe-btn-ghost text-xs" title="Export JSON + paste guide cho ai không OAuth được Meta Ads">
               📋 Export Config
             </button>
-            <button onClick={onClose} className="goe-btn goe-btn-ghost text-sm">Hủy</button>
+            <button onClick={onClose} className="goe-btn goe-btn-ghost text-sm justify-center">Hủy</button>
             <button onClick={handleCreate} disabled={submitting || !selectedAccount || !primaryText.trim() || !mediaUrl} className="goe-btn text-sm font-bold" style={{background:'linear-gradient(135deg,#7C3AED,#DB2777)', color:'white', boxShadow:'var(--shadow-clay)'}}>
               {submitting ? <><Spinner size={14}/>Đang tạo...</> : `💎 Create Ad ${totalBudget.toLocaleString('vi')} ${currency}`}
             </button>
@@ -6485,18 +6586,21 @@ function LevelUpModal({ level, onClose }) {
   );
 }
 
-function WelcomeScreen({ onStartWizard, onPasteJSON, onSettings, hasApiKey, hasWizDraft, onResumeWiz, onStartBrandGenesis, packs = [], onOpenPack, onOpenProjects, currentPackId }) {
+function WelcomeScreen({ onLoadDemo, onStartWizard, onPasteJSON, onSettings, hasApiKey, hasWizDraft, onResumeWiz, onStartBrandGenesis, packs = [], onOpenPack, onOpenProjects, currentPackId }) {
   // V14.9 — Sort packs by recency desc
   const sortedPacks = [...(packs || [])].sort((a,b) => (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0));
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-6">
+    <div className="welcome-screen-wrap min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-x-hidden">
       <div className="max-w-5xl w-full">
-        <div className="glass-card p-6 md:p-10 shadow-2xl">
+        <div className="welcome-screen-card glass-card p-4 sm:p-6 md:p-10 shadow-2xl">
           <div className="text-center mb-6">
             <div className="inline-block text-5xl mb-2">📱</div>
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 mb-3">
+              P0 MVP · demo-ready in 30 seconds
+            </div>
             <h1 className="text-3xl md:text-4xl font-head font-bold text-gradient mb-2">🎮 Game of Ecom</h1>
-            <p className="text-xs text-gray-600 mb-2 font-vn">Quest-driven content creation cho Ecom seller. <b>4 quest, 5 cấp độ, 1 mục tiêu: chinh phục feed.</b></p>
-            <p className="text-gray-600 max-w-xl mx-auto text-sm">Build a complete 30-day Facebook content pack with AI-generated images that stay on-brand.</p>
+            <p className="text-xs text-gray-600 mb-2 font-vn"><b>AI content operating workspace</b> cho ecom seller nhỏ.</p>
+            <p className="text-gray-600 max-w-2xl mx-auto text-sm">Vào demo ngay để xem một 30-day content pack hoàn chỉnh, rồi mới tạo pack riêng bằng Wizard khi đã sẵn API key.</p>
           </div>
           {hasWizDraft && (
             <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3 flex-wrap">
@@ -6505,20 +6609,28 @@ function WelcomeScreen({ onStartWizard, onPasteJSON, onSettings, hasApiKey, hasW
               <button onClick={onResumeWiz} className="btn-primary text-sm">Continue</button>
             </div>
           )}
-          {/* V22.7 — Primary: AI Wizard (proven flow: pack → workspace direct) */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <button onClick={onStartWizard} className="text-left p-5 rounded-2xl text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group goe-pulse" style={{background:'linear-gradient(135deg,#F59E0B 0%, #EC4899 50%, #A78BFA 100%)'}}>
-              <div className="flex items-center gap-2 mb-2"><span className="text-2xl">🧙</span><span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">RECOMMENDED · 30D PACK</span></div>
-              <h3 className="text-lg font-bold font-head mb-1">AI Strategy Wizard</h3>
-              <p className="text-white/90 text-xs mb-3">Brand intake → AI auto-analyze → sinh 30 ngày post hoàn chỉnh (caption + image_prompt + first_comment + hashtags). <b>Tự động mở pack vào workspace.</b></p>
-              <div className="font-medium text-sm group-hover:translate-x-1 transition-transform">Start Wizard →</div>
+          {/* P0 — Primary: instant demo pack. No API key, Vault, media or integration required. */}
+          <div className="grid gap-3 md:gap-4 md:grid-cols-3">
+            <button onClick={onLoadDemo} className="welcome-screen-primary md:col-span-2 text-left p-4 sm:p-5 rounded-2xl text-white shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 group goe-pulse" style={{background:'linear-gradient(135deg,#10B981 0%, #06B6D4 45%, #6366F1 100%)'}}>
+              <div className="flex items-center gap-2 mb-2 flex-wrap"><span className="text-2xl">⚡</span><span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">START HERE · NO API KEY</span></div>
+              <h3 className="text-lg font-bold font-head mb-1">Try Demo 30-Day Pack</h3>
+              <p className="text-white/90 text-xs mb-3">Mở ngay pack mẫu ONIIZ gồm brand DNA, 30 bài Facebook, caption, image prompt, first comment và hashtags. Dùng để hiểu workspace trước khi connect API.</p>
+              <div className="font-medium text-sm group-hover:translate-x-1 transition-transform">Open demo workspace →</div>
             </button>
-            <button onClick={onPasteJSON} className="text-left p-5 rounded-2xl bg-white border-2 border-gray-200 hover:border-indigo-400 hover:shadow-lg transition-all hover:-translate-y-1 group">
-              <div className="flex items-center gap-2 mb-2"><span className="text-2xl">📋</span></div>
-              <h3 className="text-lg font-bold font-head mb-1 text-gray-800">Paste JSON</h3>
-              <p className="text-gray-600 text-xs mb-3">Đã có sẵn posts data theo FB Pack schema? Paste vào và go ngay.</p>
-              <div className="font-medium text-sm text-indigo-600 group-hover:translate-x-1 transition-transform">Paste JSON →</div>
-            </button>
+            <div className="grid gap-4">
+              <button onClick={onStartWizard} className="text-left p-4 rounded-2xl bg-white border-2 border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all hover:-translate-y-1 group">
+                <div className="flex items-center gap-2 mb-2"><span className="text-2xl">🧙</span><span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">CREATE YOUR PACK</span></div>
+                <h3 className="text-base font-bold font-head mb-1 text-gray-800">AI Strategy Wizard</h3>
+                <p className="text-gray-600 text-xs mb-2">Brand intake → 30 ngày content text-first. API key chỉ cần khi sinh nội dung mới.</p>
+                <div className="font-medium text-xs text-amber-600 group-hover:translate-x-1 transition-transform">Start Wizard →</div>
+              </button>
+              <button onClick={onPasteJSON} className="text-left p-4 rounded-2xl bg-white border-2 border-gray-200 hover:border-indigo-400 hover:shadow-lg transition-all hover:-translate-y-1 group">
+                <div className="flex items-center gap-2 mb-2"><span className="text-2xl">📋</span></div>
+                <h3 className="text-base font-bold font-head mb-1 text-gray-800">Paste JSON</h3>
+                <p className="text-gray-600 text-xs mb-2">Đã có pack data theo schema? Paste vào workspace ngay.</p>
+                <div className="font-medium text-xs text-indigo-600 group-hover:translate-x-1 transition-transform">Paste JSON →</div>
+              </button>
+            </div>
           </div>
           {/* V22.7 — Secondary: Brand Genesis Studio (advanced research lab) */}
           {onStartBrandGenesis && (
@@ -6529,7 +6641,7 @@ function WelcomeScreen({ onStartWizard, onPasteJSON, onSettings, hasApiKey, hasW
               <span className="text-2xl">🌟</span>
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-sm" style={{color:'#7C3AED'}}>Brand Genesis Lab <span className="text-[9px] font-normal bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded ml-1">ADVANCED · STRATEGY-FIRST</span></div>
-                <div className="text-[11px] text-gray-600 leading-snug">Upload file chiến lược → 4-phase research (Keyword Tree → Content Matrix 300+ ideas → Visual DNA → Execution Plan). Cho marketers cần audit sâu trước khi tạo pack.</div>
+                <div className="text-[11px] text-gray-600 leading-snug">Advanced only: upload file chiến lược → research sâu trước khi tạo pack. P0 user mới nên mở Demo Pack hoặc dùng Wizard text-first trước.</div>
               </div>
               <span className="text-purple-500 group-hover:translate-x-1 transition-transform">→</span>
             </button>
@@ -6553,7 +6665,7 @@ function WelcomeScreen({ onStartWizard, onPasteJSON, onSettings, hasApiKey, hasW
                 <button onClick={onOpenProjects} className="btn-ghost text-xs">📂 Manage tất cả →</button>
               )}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {sortedPacks.slice(0, 12).map(p => {
                 const isCurrent = p.id === currentPackId;
                 const postsCount = (p.posts || []).length;
@@ -9117,31 +9229,31 @@ function StrategistContentBar({ packId, apiKey, posts, setPosts, setToast, selec
 function WelcomeModal({ onClose, onStartQuest }) {
   // V12.5 — First-time welcome / onboarding screen
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-amber-900 via-orange-900 to-rose-900 z-50 flex items-center justify-center p-3 md:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={e=>e.stopPropagation()}>
+    <div className="welcome-onboarding-backdrop fixed inset-0 bg-gradient-to-br from-amber-900 via-orange-900 to-rose-900 z-50 flex items-center justify-center p-2 sm:p-3 md:p-6 overflow-y-auto">
+      <div className="welcome-onboarding-card bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden" onClick={e=>e.stopPropagation()}>
         {/* Banner */}
-        <div className="p-6 md:p-10 text-center relative overflow-hidden"
+        <div className="welcome-onboarding-banner p-4 sm:p-6 md:p-10 text-center relative overflow-hidden"
           style={{background: 'linear-gradient(135deg, #FFE9B8 0%, #FFD15C 40%, #F59E0B 100%)', color: 'var(--ink-900)'}}>
           <div className="absolute inset-0 opacity-30" style={{background:'radial-gradient(ellipse at 30% 30%, white 0%, transparent 50%)'}}></div>
           <div className="absolute top-3 right-3 text-[10px] font-retro" style={{color: 'var(--primary-900)'}}>NEW GAME</div>
           <div className="relative">
-            <div className="text-7xl mb-3 goe-bounce">🏴‍☠️</div>
-            <h1 className="font-display text-4xl md:text-6xl mb-2" style={{color: 'var(--ink-900)'}}>Yo, Captain!</h1>
+            <div className="welcome-onboarding-icon text-5xl sm:text-7xl mb-2 sm:mb-3 goe-bounce">🏴‍☠️</div>
+            <h1 className="welcome-onboarding-title font-display text-3xl sm:text-4xl md:text-6xl mb-2" style={{color: 'var(--ink-900)'}}>Yo, Captain!</h1>
             <p className="text-sm md:text-base font-bold" style={{color: 'var(--primary-900)'}}>Chào mừng tới <b>Game of Ecom</b> — Grand Line của thương hiệu</p>
             <p className="text-xs md:text-sm mt-2 max-w-md mx-auto" style={{color: 'var(--ink-700)'}}>Mở khoá kho báu One Piece bằng cách hoàn thành <b>4 voyage</b> · từ <b>East Blue 🐟</b> đến <b>Pirate King 🏴‍☠️</b></p>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-5 md:p-6 space-y-4">
+        <div className="welcome-onboarding-body p-4 sm:p-5 md:p-6 space-y-3 sm:space-y-4">
           <div className="text-center">
             <div className="text-xs font-bold text-amber-600 mb-1">⚔️ 4 VOYAGE · 5 RANK · 1 KHO BÁU HUYỀN THOẠI</div>
             <div className="text-sm text-gray-700">Mỗi action trên thuyền (vẽ ảnh, publish, sync) → tích <b>฿ Bounty</b>. Rank đầu là <b>🐟 East Blue</b>, boss cuối là <b>🏴‍☠️ Pirate King</b> — chinh phục Grand Line trong 30 ngày!</div>
           </div>
 
           {/* Bento grid — featured Q1 spans 2 cols, then Q2/Q3 one each, Q4 spans 2 */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="col-span-2 rounded-2xl p-3 flex items-center gap-3"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="sm:col-span-2 rounded-2xl p-3 flex items-center gap-3"
               style={{background: 'linear-gradient(135deg, #E6F4FB 0%, #BAE6FD 100%)', border: '2px solid var(--accent-500)', boxShadow: '0 3px 0 0 var(--accent-700)'}}>
               <div className="text-3xl">⛵</div>
               <div className="flex-1">
@@ -9163,7 +9275,7 @@ function WelcomeModal({ onClose, onStartQuest }) {
               <div className="font-display text-sm" style={{color: 'var(--success-700)'}}>Đào Kho Báu</div>
               <div className="text-[10px]" style={{color: 'var(--ink-500)'}}>+30 ฿</div>
             </div>
-            <div className="col-span-2 rounded-2xl p-3 flex items-center gap-3"
+            <div className="sm:col-span-2 rounded-2xl p-3 flex items-center gap-3"
               style={{background: 'linear-gradient(135deg, #FECDD3 0%, #FB7185 100%)', border: '2px solid var(--danger-500)', boxShadow: '0 3px 0 0 var(--danger-700)'}}>
               <div className="text-3xl">🏴‍☠️</div>
               <div className="flex-1">
@@ -9188,8 +9300,8 @@ function WelcomeModal({ onClose, onStartQuest }) {
             </ul>
           </div>
 
-          <div className="flex gap-2">
-            <button onClick={onClose} className="goe-btn goe-btn-ghost text-sm">
+          <div className="welcome-onboarding-actions flex gap-2">
+            <button onClick={onClose} className="goe-btn goe-btn-ghost text-sm justify-center">
               Skip — ra biển luôn
             </button>
             <button onClick={()=>{ onStartQuest(); onClose(); }} className="goe-btn goe-btn-primary text-sm font-display flex-1 justify-center" style={{fontFamily: 'Bowlby One, sans-serif'}}>
@@ -9610,9 +9722,9 @@ function AppHeader({ brandName, onSettings, onNewPack, hasApiKey, onExport, canE
   const isMobile = useIsMobile();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   return (
-    <header className="glass sticky top-0 z-30 border-b border-white/30">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
+    <header className="mobile-app-header glass sticky top-0 z-30 border-b border-white/30">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 md:py-3 flex items-center gap-2 md:gap-3 flex-nowrap md:flex-wrap">
+        <div className="mobile-header-title flex items-center gap-2 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center text-white text-lg shadow-lg">🎮</div>
           <div>
             <h1 className="font-head font-bold text-lg leading-none text-gradient">Game of Ecom</h1>
@@ -9736,9 +9848,12 @@ function AppHeader({ brandName, onSettings, onNewPack, hasApiKey, onExport, canE
             </button>
             {showMobileMenu && (
               <>
-                <div className="fixed inset-0 z-30" onClick={()=>setShowMobileMenu(false)}/>
-                <div className="absolute top-full right-0 mt-2 w-64 bg-white border-2 border-amber-200 rounded-2xl shadow-2xl z-40 p-2 max-h-[80vh] overflow-auto">
-                  <div className="text-[10px] font-bold text-gray-500 px-2 py-1 uppercase tracking-wide">Tính năng</div>
+                <div className="mobile-action-scrim fixed inset-0 z-30" onClick={()=>setShowMobileMenu(false)}/>
+                <div className="mobile-action-sheet absolute top-full right-0 mt-2 w-64 bg-white border-2 border-amber-200 rounded-2xl shadow-2xl z-40 p-2 max-h-[80vh] overflow-auto">
+                  <div className="flex items-center justify-between px-2 py-2 border-b border-amber-100 mb-1">
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Mobile Command Center</div>
+                    <button onClick={()=>setShowMobileMenu(false)} className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold" aria-label="Close menu">×</button>
+                  </div>
                   {onOpenStudio && cloudUser && (
                     <button onClick={()=>{onOpenStudio();setShowMobileMenu(false);}} className="w-full text-left px-3 py-3 rounded-xl hover:bg-purple-50 flex items-center gap-3 font-bold" style={{color:'#7e22ce'}}><span className="text-xl">🎬</span><span>Video Studio</span></button>
                   )}
@@ -10097,7 +10212,7 @@ Now produce the full 30-post FB Pack as a single JSON object exactly matching th
     if (!data.brand_name.trim()) { setToast({type:"warn",msg:"Brand name is required"}); return; }
     setGenerating(true);
     setStreamedText("");
-    const stages = ["📚 Analyzing your brand...", "🎨 Designing content pillars...", "✍️ Writing 30 captions...", "🖼️ Crafting 30 image prompts...", "🏷️ Generating hashtag strategy..."];
+    const stages = ["📚 Analyzing your brand...", "🎨 Designing content pillars...", "✍️ Writing 30 captions...", "🖼️ Drafting reusable image prompts...", "🏷️ Packaging text-first workspace..."];
     let stageIdx = 0;
     setGenProgress(stages[0]);
     const stageTimer = setInterval(() => { stageIdx = Math.min(stageIdx + 1, stages.length - 1); setGenProgress(stages[stageIdx]); }, 6000);
@@ -10166,7 +10281,7 @@ Now produce the full 30-post FB Pack as a single JSON object exactly matching th
         <div className="glass-card max-w-xl w-full p-8 text-center">
           <Spinner size={48} />
           <h3 className="text-xl font-head font-bold mt-4 text-gradient">{genProgress}</h3>
-          <p className="text-sm text-gray-600 mt-2">Streaming from Gemini 2.5 Pro... this takes ~30s</p>
+          <p className="text-sm text-gray-600 mt-2">Streaming text-first pack... images and automation stay optional after review.</p>
           {streamedText && (
             <div className="mt-4 text-left max-h-48 overflow-y-auto scrollbar-thin bg-gray-50 rounded-lg p-3 text-xs font-mono text-gray-600">
               {streamedText.slice(-1200)}
@@ -10451,9 +10566,12 @@ Now produce the full 30-post FB Pack as a single JSON object exactly matching th
                 {mascotRefs.slice(0,3).map((m, i) => <img key={i} src={`data:${m.mime};base64,${m.base64}`} className="w-16 h-16 object-cover rounded-lg border" />)}
               </div>
             )}
-            <label className="flex items-center gap-2 text-sm p-2 bg-amber-50 border border-amber-200 rounded-lg">
-              <input type="checkbox" checked={data.also_generate_images} onChange={e=>setField("also_generate_images",e.target.checked)} />
-              <span>Also generate all 30 post images now <span className="text-xs text-amber-700">(+~$3.90 / 30 imgs × $0.13)</span></span>
+            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+              <b>P0 recommended flow:</b> generate the 30-day text pack first, review hooks/captions/image prompts in workspace, then create images only for selected posts. This keeps first-run faster and safer.
+            </div>
+            <label className="flex items-start gap-2 text-sm p-2 bg-gray-50 border border-gray-200 rounded-lg opacity-90">
+              <input type="checkbox" checked={data.also_generate_images} onChange={e=>setField("also_generate_images",e.target.checked)} className="mt-0.5" />
+              <span>Advanced: also generate all 30 post images now <span className="text-xs text-gray-500 block">Optional later step. Requires image model/billing and may take several minutes.</span></span>
             </label>
             {lastError && (
               <div className="bg-rose-50 border-2 border-rose-300 rounded-lg p-3 text-sm">
@@ -10473,7 +10591,7 @@ Now produce the full 30-post FB Pack as a single JSON object exactly matching th
                 </div>
               </div>
             )}
-            <button onClick={handleGenerate} className="btn-primary w-full py-3 text-base">🎯 Generate 30-Day Pack <span className="text-xs opacity-80 ml-2">(text gen ~$0.05, ~30s)</span></button>
+            <button onClick={handleGenerate} className="btn-primary w-full py-3 text-base">🎯 Generate Text-First 30-Day Pack <span className="text-xs opacity-80 ml-2">(~30s, images later)</span></button>
           </div>
         )}
 
@@ -10742,9 +10860,9 @@ function PostCard({ post, brand, imageB64, mascotRefs, generating, onGenerate, o
           </details>
 
           <details className="mb-2" open>
-            <summary className="text-xs font-semibold text-gray-700 flex items-center justify-between">
+            <summary className="postcard-prompt-summary text-xs font-semibold text-gray-700 flex items-center justify-between">
               <span>Image Prompt</span>
-              <span className="flex gap-2">
+              <span className="postcard-prompt-actions flex gap-2">
                 <button onClick={(e)=>{e.preventDefault(); handleCopy(post.image_prompt,"prompt");}} className="text-indigo-600 hover:underline">Copy</button>
                 <select value={post.aspect_ratio || brand?.default_aspect_ratio || '1:1'} onChange={(e)=>{onUpdatePost && onUpdatePost({...post, aspect_ratio: e.target.value});}} className="text-[10px] border rounded px-1 py-0.5" title="Aspect ratio for this post" onClick={e=>e.stopPropagation()}>
                   <option value="1:1">1:1 Square</option>
@@ -12094,6 +12212,40 @@ function StoryboardEditorModal({ post, brand, apiKey, model, mascotRefs, product
   // Missing images = scenes without base64 (shouldn't normally happen but safety net)
   const missingImageScenes = scenes.filter(s => !s.base64);
 
+  // V22.9 — Shared 8-beat formatter for frame-pack image generation and Omni prompt copy.
+  const V229_BEAT_NAMES = ['HOOK','SETUP','INTRO','INTERACTION','RISING','CLIMAX','RELEASE','RESOLUTION'];
+  const splitVoiceForBeats = (txt) => {
+    const words = String(txt || '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return Array.from({length:8}, () => '');
+    const chunk = Math.max(3, Math.ceil(words.length / 8));
+    return Array.from({length:8}, (_, i) => words.slice(i * chunk, (i + 1) * chunk).join(' ').slice(0, 80));
+  };
+  const getSceneBeatBlueprint = (scene, duration, channelLanguage) => {
+    const beatDuration = duration / 8;
+    const beatTimes = Array.from({length:8}, (_,k) => ({ start: (k * beatDuration).toFixed(2), end: ((k+1) * beatDuration).toFixed(2) }));
+    const frameBeats = Array.isArray(scene?.frame_beats) && scene.frame_beats.length ? scene.frame_beats.slice(0,8) : [];
+    const fallbackVoice = splitVoiceForBeats(scene?.voice_over_text || scene?.voice_script || post?.voice_script || post?.caption || '');
+    return beatTimes.map((t, k) => {
+      const b = frameBeats[k] || {};
+      return {
+        panel: k + 1,
+        start: t.start,
+        end: t.end,
+        beat: b.beat || V229_BEAT_NAMES[k],
+        narrative_purpose: b.narrative_purpose || scene?.narrative_purpose || (k < 2 ? 'establish' : k < 5 ? 'develop' : k === 5 ? 'climax' : k === 6 ? 'resolve' : 'transition'),
+        shot_type: b.shot_type || scene?.shot_type || 'MEDIUM',
+        camera_movement: b.camera_movement || scene?.camera_movement || (k < 2 ? 'slow_push_in' : k === 5 ? 'dolly_in' : 'smooth_follow'),
+        visual_action: b.visual_action || scene?.action || `Continue scene action beat ${k+1}`,
+        transition_to_next: b.transition_to_next || scene?.transition_description || scene?.next_scene_bridge || 'Maintain the same character and location; move smoothly into the next beat.',
+        voice_over_text: b.voice_over_text || fallbackVoice[k] || '',
+        on_screen_text: b.on_screen_text || scene?.on_screen_text || '',
+        bgm_cue: b.bgm_cue || scene?.bgm_cue || 'cinematic warm build',
+        sfx_cue: b.sfx_cue || scene?.sfx_cue || 'subtle practical ambience'
+      };
+    });
+  };
+  const formatBeatBlueprint = (beats) => beats.map(b => `P${b.panel} ${b.start}-${b.end}s | ${b.beat} | ${b.shot_type} | ${b.camera_movement} | VISUAL: ${b.visual_action} | VO: "${b.voice_over_text || 'none'}" | TEXT: "${b.on_screen_text || 'none'}" | TRANSITION: ${b.transition_to_next} | BGM: ${b.bgm_cue} | SFX: ${b.sfx_cue}`).join('\n');
+
   // V8.4 — Re-plan storyboard from selected voice (deletes existing scenes + chain videos!)
   const handleReplanFromVoice = async () => {
     if (!apiKey) { setToast({type:'warn', msg:'Set API key first'}); return; }
@@ -12140,7 +12292,8 @@ function StoryboardEditorModal({ post, brand, apiKey, model, mascotRefs, product
         const id = await saveAsset({
           type: 'storyboard', postN: post.n, sceneN: i+1, mime: 'image/png', base64: '',
           source: 'replan-voice', prompt: sc.image_prompt, time: `${sc.start_s}-${sc.end_s}s`,
-          action: sc.action, brand: brand?.name
+          action: sc.action, brand: brand?.name,
+          ...buildStoryboardSceneMeta(sc)
         });
         sceneAssetsCreated.push({ id, sceneN: i+1, prompt: sc.image_prompt });
       }
@@ -12294,86 +12447,61 @@ function StoryboardEditorModal({ post, brand, apiKey, model, mascotRefs, product
       const action = scene.action || scene.prompt || `Scene ${idx+1}`;
       const aspectRatio = post.aspect_ratio || brand?.default_aspect_ratio || '16:9';
 
-      // V22.6 — Self-explanatory REFERENCE BRIEF (technical brief — never appears in final video)
-      // Tech labels in ENGLISH (Omni Flash reads English better); VO bubbles in channel language (VN)
-      const voiceScript = scene.voice_script || post?.voice_script || '';
+      // V22.9 — Director-grade, OCR-friendly 8-frame reference brief.
+      // Tech labels in ENGLISH (Omni Flash reads English better); VO bubbles in channel language (VN).
+      const voiceScript = scene.voice_over_text || scene.voice_script || post?.voice_script || '';
       const brandMood = (brand?.mood || []).join(', ');
       const channelLanguage = brand?.language || 'Vietnamese';
-      // V22.8 — 8-frame 2×4 grid for 10s Omni Flash scenes (1.25s per beat)
       const beatDuration = duration / 8;
       const beatTimes = Array.from({length:8}, (_,k) => ({
         start: (k * beatDuration).toFixed(2),
         end: ((k+1) * beatDuration).toFixed(2)
       }));
-      const handPrompt = `Hand-drawn black-and-white film storyboard REFERENCE SHEET, 2×4 panel grid layout (2 rows × 4 columns = 8 panels), ${duration}-second scene broken into 8 sub-beats at ${beatDuration.toFixed(2)}-second intervals each.
+      const beats = getSceneBeatBlueprint(scene, duration, channelLanguage);
+      const directorBeatTable = formatBeatBlueprint(beats);
+      const handPrompt = `High-resolution professional film storyboard REFERENCE SHEET, clean black-and-white ink + pencil, 2×4 panel grid layout (2 rows × 4 columns = 8 panels), ${duration}-second scene broken into 8 connected sub-beats at ${beatDuration.toFixed(2)}-second intervals each.
 
 ⚠ THIS IS A TECHNICAL REFERENCE BRIEF FOR AI OMNI FLASH VIDEO GENERATION — it will NEVER appear inside the final video. The final video must animate the SCENE itself in full-screen, not show storyboard panels.
 
-ASPECT RATIO: 16:9 storyboard sheet (landscape paper format, 2×4 grid fits naturally)
-STYLE: rough ink linework, hand-drawn pencil + ink, professional film storyboard artist style (Pixar/Marvel pre-production). Black ink on cream paper. Detailed hatching for shadows. CLEAN LEGIBLE handwritten labels — must be readable at thumbnail size.
+ASPECT RATIO: 16:9 storyboard sheet (landscape paper format, 2×4 grid fits naturally). Generate as a large, sharp presentation board with clean spacing.
+STYLE: professional film storyboard artist style, confident readable drawing, clean panel borders, cinematic composition, grayscale ink on cream paper. Prioritize clear staging and readable text over decorative detail.
 
-EACH OF THE 8 PANELS MUST CONTAIN ALL 6 ELEMENTS BELOW (all text must be CRISP, READABLE, NOT BLURRY):
+READABILITY RULES:
+✓ Big panels, no tiny handwriting, no dense micro-notes.
+✓ Text must be bold block lettering, crisp and legible at thumbnail size.
+✓ If space is tight, shorten text instead of shrinking it.
+✓ Every panel must clearly show subject pose, camera direction arrows, VO text box, and on-screen text box if specified.
+✓ Draw the actual scene beats, not generic placeholder figures.
 
-═══ 1) HEADER BAR (black bg, white text, top edge of panel) — ENGLISH ONLY ═══
-Format: "N.M | START.SSs - END.SSs | SHOT TYPE — BEAT"
-where N = scene num, M = panel num (1-8), times match the 8-beat schedule below
-SHOT TYPE choices: "ESTABLISHING SHOT" / "MEDIUM SHOT" / "CLOSE-UP" / "WIDE SHOT" / "OVER-THE-SHOULDER" / "POV" / "INSERT"
-BEAT choices: "HOOK" / "SETUP" / "INTRO" / "INTERACTION" / "RISING" / "CLIMAX" / "RELEASE" / "RESOLUTION"
+PANEL LAYOUT REQUIREMENTS:
+1) HEADER BAR at top of each panel: "#N.M | START-END | SHOT | BEAT" in English.
+2) MAIN DRAWING: subject pose/expression + props/location + camera angle.
+3) MOTION ARROWS: label only the main move (DOLLY IN, PAN LEFT, ZOOM IN, STATIC HOLD, etc.).
+4) VO BOX: large bottom-right box in ${channelLanguage}, format: VO: "short line".
+5) TEXT BOX: large bottom-center if on-screen text is specified, format: TEXT: "exact overlay". If none, write TEXT: none.
+6) AUDIO STRIP: tiny but readable bottom-left, format: BGM + SFX.
 
-═══ 2) DRAWN SCENE (main panel area) ═══
-- Character pose + clear facial expression (readable emotion)
-- Camera angle indicator drawn small in corner: "EYE-LEVEL" / "LOW ANGLE" / "HIGH ANGLE" / "DUTCH TILT"
-- Background elements (props, location markers)
-- All drawn SOLID — no placeholder shapes
-
-═══ 3) CAMERA / MOTION ANNOTATIONS (overlay inside panel) — ENGLISH ONLY ═══
-- Hand-drawn arrows showing direction
-- Label arrows with CRISP TEXT: "ZOOM IN", "ZOOM OUT", "PAN LEFT", "PAN RIGHT", "DOLLY IN", "DOLLY OUT", "TILT UP", "TILT DOWN", "TRACK RIGHT", "STATIC HOLD", "WHIP PAN"
-- Mark CLIMAX panel (panel 5 or 6) with bold "★ KEY BEAT" label
-
-═══ 4) VOICE-OVER BUBBLE (bottom-right, rectangular block, DASHED BORDER, italic) — CHANNEL LANGUAGE (${channelLanguage}) ═══
-Format: 「VO: '<câu voice-over ngắn cho ${beatDuration.toFixed(2)}s này, ${channelLanguage} natural conversational tone>'」
-- ${voiceScript ? `Reference full scene voice script: "${voiceScript.slice(0,300)}" — split this into 8 proportional parts across 8 panels (each panel gets ~${beatDuration.toFixed(1)}s worth = roughly 3-6 words VN)` : `Write 8 short ${channelLanguage} VO lines (3-6 words each) that connect into a natural 8-line narration matching the action arc`}
-- TEXT MUST BE CLEARLY READABLE — bold ink, NOT decorative
-- Use straight quotes around the VO text
-- Keep VO bubble compact but text crisp
-
-═══ 5) AUDIO CUE (bottom-left corner, small) — ENGLISH ONLY ═══
-- "♪ BGM: <description>" e.g. "♪ BGM: soft warm swell" / "♪ BGM: tense beat builds" / "♪ BGM: playful uplifting" / "♪ BGM: drop"
-- "🔊 SFX: <description>" e.g. "🔊 SFX: paper rustle" / "🔊 SFX: chime" / "🔊 SFX: footstep" / "🔊 SFX: laughter"
-
-═══ 6) ACTION CAPTION (bottom strip) — CHANNEL LANGUAGE (${channelLanguage}) ═══
-- 1 line, ≤10 words, plain text, describes visual action only
-
-═══════════════════════════════════════════════════════════
+AUTHORITATIVE 8-BEAT DIRECTOR BLUEPRINT — follow exactly:
+${directorBeatTable}
 
 SCENE ACTION (${duration}s total):
 "${action}"
 
-8-BEAT ARC for 10s storytelling (Omni Flash optimal):
-• Panel 1 (${beatTimes[0].start}–${beatTimes[0].end}s) — HOOK: visual hook, eye-catch, establish location/character
-• Panel 2 (${beatTimes[1].start}–${beatTimes[1].end}s) — SETUP: context detail, supporting info
-• Panel 3 (${beatTimes[2].start}–${beatTimes[2].end}s) — INTRO: subject's first action/move
-• Panel 4 (${beatTimes[3].start}–${beatTimes[3].end}s) — INTERACTION: action engages with object/character
-• Panel 5 (${beatTimes[4].start}–${beatTimes[4].end}s) — RISING: tension build, micro-expression shift
-• Panel 6 (${beatTimes[5].start}–${beatTimes[5].end}s) — CLIMAX (★): strongest emotional beat, peak action
-• Panel 7 (${beatTimes[6].start}–${beatTimes[6].end}s) — RELEASE: payoff visible, reaction
-• Panel 8 (${beatTimes[7].start}–${beatTimes[7].end}s) — RESOLUTION: settle, fade, setup next scene
+SCENE TRANSITION DESCRIPTION:
+${scene.transition_description || scene.visual_description || 'Move continuously from the first keyframe to the last keyframe. Keep the same character, location, color palette, and props visible unless the beat explicitly changes them.'}
+
+FIRST KEYFRAME:
+${scene.first_keyframe || 'Opening frame matches the color scene reference and establishes subject, location, and mood.'}
+
+LAST KEYFRAME / BRIDGE TO NEXT SCENE:
+${scene.last_keyframe || scene.next_scene_bridge || 'Final frame resolves the action and creates a visual handoff into the next storyboard scene.'}
 
 CHARACTER CONTINUITY (must match across ALL 8 panels):
 ${brand?.character ? `Character bible: ${brand.character.toString().slice(0,300)}` : '(consistent character pose + outfit + hair + body shape across all 8 panels)'}
 ${brand?.name ? `Brand: ${brand.name}` : ''}
 ${brandMood ? `Mood: ${brandMood}` : ''}
 
-CRITICAL RULES:
-✓ ALL technical labels (header bar, camera moves, audio cues, beat names) MUST be in ENGLISH
-✓ ONLY voice-over bubbles + action caption are in ${channelLanguage}
-✓ Same character drawn in all 8 panels — consistent body shape, outfit, hair, face shape
-✓ All text CRISP and READABLE — Omni Flash will read this as instruction
-✓ VO bubbles split full voice_script proportionally across 8 frames (~3-6 words each)
-✓ 2×4 grid layout — 2 rows (top: panels 1-4, bottom: panels 5-8), 4 columns
-
-OUTPUT: single PNG, 16:9 landscape, 2×4 grid (8 panels), all 6 elements present in every panel. NO photographic detail, NO finished color, NO product/logo placement. NO blurred/illegible text. NO empty panels.`;
+OUTPUT: one single sharp PNG, 16:9 landscape storyboard sheet, 2×4 grid, 8 full panels, readable VO/TEXT boxes, no blurred writing, no empty panels, no finished color, no product/logo hallucination, no watermark.`;
 
       // Call Gemini image gen browser-direct
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`, {
@@ -12406,7 +12534,7 @@ OUTPUT: single PNG, 16:9 landscape, 2×4 grid (8 panels), all 6 elements present
         time: `${(scene.start_s||idx*duration).toFixed(1)}-${(scene.end_s||(idx+1)*duration).toFixed(1)}s`,
         action: action.slice(0, 200),
         linked_scene_id: scenes[idx].id,
-        aspect_ratio: '4:3',
+        aspect_ratio: '16:9',
         label: `Frame Pack — Post ${post.n} · Scene ${idx+1}`
       });
       console.log(`[Frame Pack] Saved scene ${idx+1} → asset ${framePackAssetId?.slice(0,6)}`);
@@ -12431,32 +12559,47 @@ OUTPUT: single PNG, 16:9 landscape, 2×4 grid (8 panels), all 6 elements present
       const hasSceneImage = !!scene.base64;
       const channelLanguage = brand?.language || 'Vietnamese';
       const sceneAction = scene.action || `Scene ${idx+1}`;
+      const beats = getSceneBeatBlueprint(scene, duration, channelLanguage);
+      const directorBlueprint = formatBeatBlueprint(beats);
+      const nextScene = scenes[idx + 1];
+      const previousScene = scenes[idx - 1];
 
-      // V22.8 — Two-image workflow optimized for 10s Omni Flash with 8-beat storyboard
+      // V22.9 — Two-image workflow + authoritative text blueprint for smooth 10s Omni Flash output
       const prompt = `Generate a continuous ${duration}-second cinematic video, ${aspectRatio} FULL-SCREEN aspect ratio (the video MUST fill the entire frame edge-to-edge — no letterbox, no storyboard overlay, no panel borders in output).
 
 ANIMATE THE SCENE: "${sceneAction}"
 
+DIRECTOR CONTINUITY CONTEXT:
+- Previous scene action: "${previousScene?.action || 'none — this is the first scene'}"
+- Current scene narrative purpose: ${scene.narrative_purpose || 'develop'}
+- Scene transition description: ${scene.transition_description || scene.visual_description || 'continuous cinematic motion from first keyframe to last keyframe'}
+- First keyframe: ${scene.first_keyframe || 'match Image 1 exactly at the starting frame'}
+- Last keyframe: ${scene.last_keyframe || 'clear visual change from the starting frame through pose, camera, object state, or composition'}
+- Bridge to next scene: ${scene.next_scene_bridge || (nextScene ? `finish in a pose/composition that motivates the next scene: ${nextScene.action || 'next action'}` : 'final CTA settle')}
+- Inter-scene boundary after this clip: ${scene.inter_scene_boundary || (nextScene ? 'scene_cut' : 'final')}
+
+AUTHORITATIVE 8-BEAT TIMELINE — follow this text even if the storyboard image text is hard to read:
+${directorBlueprint}
+
 IMAGE 1 (color reference) = CHARACTER + LOCATION LOCK:
-- Match the character's exact appearance: face, body shape, outfit, color, proportions — keep IDENTICAL across all ${duration} seconds
-- Match the location, lighting, color palette, set dressing from this image
-- This is the visual style + character continuity reference
+- Match the character's exact appearance: face, body shape, outfit, color, proportions — keep IDENTICAL across all ${duration} seconds.
+- Match the location, lighting, color palette, set dressing and art direction from this image.
+- Start the video from this image's world, not from the storyboard sheet.
 
 IMAGE 2 (black-and-white 8-panel 2×4 storyboard sheet) = TECHNICAL BRIEF ONLY:
-- READ the storyboard for: 8-BEAT TIMING (panels 1→8 mapped across ${duration}s, each ~${(duration/8).toFixed(2)}s), shot types (header bars), camera moves (zoom/pan/dolly arrows), audio cues (♪ BGM / 🔊 SFX), voice-over bubbles (${channelLanguage})
-- 8-BEAT ARC: HOOK → SETUP → INTRO → INTERACTION → RISING → CLIMAX (★) → RELEASE → RESOLUTION
-- ⚠ CRITICAL: DO NOT render the storyboard sheet, panel borders, or any black-and-white frames in the output video. The storyboard is INSTRUCTIONS, never visual content.
-- The final video shows ONLY the live cinematic scene (matching Image 1's style) — never storyboard art
+- Use it only to reinforce 8-beat timing, staging, camera arrows, VO boxes, on-screen text boxes, BGM/SFX cues, and emotional arc.
+- ⚠ CRITICAL: DO NOT render the storyboard sheet, panel borders, handwritten notes, or black-and-white frames in the output video.
+- The final video shows ONLY the live cinematic scene matching Image 1's style.
 
 OUTPUT REQUIREMENTS:
-✓ ${aspectRatio} full-frame edge-to-edge — no padding, no panel grid visible
-✓ Character identical to Image 1 (same face/outfit/proportions) throughout all ${duration}s
-✓ Voice-over in ${channelLanguage} — speak the 8 VO lines from storyboard bubbles, timed to each ${(duration/8).toFixed(2)}s beat sequentially
-✓ Camera follows storyboard arrows (zoom/pan/dolly as labeled on each panel)
-✓ Audio matches cues: BGM build through 8 beats (calm→tense→peak→release), SFX as labeled
-✓ Smooth continuous motion (1-take feel through all 8 beats), film-like color grade, 24fps cinematic
-✓ Emotional arc peaks at panel 6 (CLIMAX ★) — strongest beat there
-✗ NO on-screen text, NO storyboard panels, NO black borders, NO watermarks, NO multi-panel split-screen, NO hard cuts mid-beat`;
+✓ ${aspectRatio} full-frame edge-to-edge — no padding, no panel grid visible.
+✓ Character identical to Image 1 (same face/outfit/proportions) throughout all ${duration}s.
+✓ Voice-over in ${channelLanguage}: speak the VO lines from the 8-beat timeline sequentially and naturally, aligned to each ${(duration/8).toFixed(2)}s beat. Do not rush.
+✓ On-screen text: render ONLY the exact TEXT values listed in the 8-beat timeline; place them large, clean, and safe-area centered/lower-third. If TEXT is "none", show no text.
+✓ Camera and subject movement must interpolate smoothly from first keyframe to last keyframe; every beat must visibly evolve.
+✓ Audio follows BGM and SFX cues from the timeline; build toward CLIMAX at panel 6, release at panel 7, settle/bridge at panel 8.
+✓ Smooth continuous cinematic motion, 24fps filmic pacing, natural motion blur, no frozen slideshow feel.
+✗ NO random text, NO unreadable micro-text, NO storyboard panels, NO black borders, NO watermarks, NO multi-panel split-screen, NO abrupt hard cuts inside a beat`;
 
       await navigator.clipboard.writeText(prompt);
       try { awardXP(5, '📋 Omni prompt copied'); } catch(e){}
@@ -12696,7 +12839,7 @@ OUTPUT REQUIREMENTS:
               <div>Chưa c\xf3 scenes. Generate voice trước → click "🎞️ Auto Storyboard" tr\xean post card.</div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {scenes.map((s, i) => {
                 const sceneN = s.sceneN || (i+1);
                 const chainVid = chainBySceneN[sceneN]; // video FROM this scene TO next
@@ -12735,6 +12878,20 @@ OUTPUT REQUIREMENTS:
                   )}
                   <div className="p-2.5 space-y-1.5">
                     <div className="text-[11px] font-semibold text-gray-700 font-vn line-clamp-2" title={s.action}>{s.action || '(no action)'}</div>
+                    {/* V22.9 — Director metadata preview: VO + on-screen text + camera continuity */}
+                    {(s.narrative_purpose || s.shot_type || s.camera_movement || s.voice_over_text || s.on_screen_text) && (
+                      <div className="rounded-lg bg-slate-50 border border-slate-200 p-2 space-y-1">
+                        <div className="flex flex-wrap gap-1 text-[8px] font-bold uppercase tracking-wide">
+                          {s.narrative_purpose && <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">{s.narrative_purpose}</span>}
+                          {s.shot_type && <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">{s.shot_type}</span>}
+                          {s.camera_movement && <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">{s.camera_movement}</span>}
+                          {s.inter_scene_boundary && <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">{s.inter_scene_boundary}</span>}
+                        </div>
+                        {s.voice_over_text && <div className="text-[10px] text-slate-700 line-clamp-2"><b>VO:</b> {s.voice_over_text}</div>}
+                        {s.on_screen_text && <div className="text-[10px] text-slate-700 line-clamp-1"><b>TEXT:</b> {s.on_screen_text}</div>}
+                        {s.next_scene_bridge && <div className="text-[9px] text-slate-500 line-clamp-2"><b>Bridge:</b> {s.next_scene_bridge}</div>}
+                      </div>
+                    )}
                     {editingPrompt === i ? (
                       <div>
                         <textarea defaultValue={s.prompt || ''} id={`prompt-${i}`} className="input-field text-[10px] font-mono h-24"/>
@@ -12754,12 +12911,12 @@ OUTPUT REQUIREMENTS:
                       <button onClick={()=>handleRegenScene(i)} disabled={busy !== null} className="flex-1 text-[10px] py-1 rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200 disabled:opacity-30">
                         {busy === i ? <Spinner size={10}/> : '🔄 Regen'}
                       </button>
-                      {/* V22.8 — Hand-drawn 2×4 Frame Pack (8 panels) for Omni Flash 10s video reference */}
-                      <button onClick={()=>handleGenFramePack(i)} disabled={busy !== null} className="flex-1 text-[10px] py-1 rounded font-bold hover:opacity-90 disabled:opacity-30" style={{background:'linear-gradient(135deg,#3A2818,#7A5230)', color:'#F5EFE4'}} title="Generate 2×4 hand-drawn 8-beat action breakdown — feed Omni Flash for cinematic 10s video">
+                      {/* V22.9 — Director-grade 2×4 Frame Pack (8 panels) for Omni Flash 10s video reference */}
+                      <button onClick={()=>handleGenFramePack(i)} disabled={busy !== null} className="flex-1 text-[10px] py-1 rounded font-bold hover:opacity-90 disabled:opacity-30" style={{background:'linear-gradient(135deg,#3A2818,#7A5230)', color:'#F5EFE4'}} title="Generate sharp 2×4 director storyboard: 8 beats, VO, text, camera, bridge — feed Omni Flash for cinematic 10s video">
                         {busy === `frame-${i}` ? <Spinner size={10}/> : '🎨 8-Frame'}
                       </button>
-                      {/* V22.4 — Copy paste-ready Omni Flash prompt for Google Flow Khung hình mode */}
-                      <button onClick={()=>handleCopyOmniPrompt(i)} className="flex-1 text-[10px] py-1 rounded font-bold hover:opacity-90" style={{background:'linear-gradient(135deg,#0EA5E9,#6366F1)', color:'white'}} title="Copy paste-ready prompt cho Google Flow Omni Flash. Workflow: Click → mở Flow → Khung hình mode → paste prompt + kéo thả 2 ảnh ref (scene + 4-frame)">
+                      {/* V22.9 — Copy director-grade Omni Flash prompt for Google Flow Khung hình mode */}
+                      <button onClick={()=>handleCopyOmniPrompt(i)} className="flex-1 text-[10px] py-1 rounded font-bold hover:opacity-90" style={{background:'linear-gradient(135deg,#0EA5E9,#6366F1)', color:'white'}} title="Copy prompt Omni có đầy đủ 8-beat timeline, VO, on-screen text, camera, audio và bridge. Workflow: paste prompt + kéo 2 ảnh ref (scene + 8-frame)">
                         📋 Omni
                       </button>
                       {i + 1 < scenes.length && (
@@ -12768,13 +12925,13 @@ OUTPUT REQUIREMENTS:
                         </button>
                       )}
                     </div>
-                    {/* V22.2 — Show Frame Pack image INLINE (always visible, not collapsed) */}
+                    {/* V22.9 — Show Director Frame Pack image INLINE, larger and click-to-inspect */}
                     {s.framePackB64 && (
                       <div className="mt-2 p-1.5 rounded-lg border-2" style={{borderColor:'#7A5230', background:'linear-gradient(135deg,#FAF6EE,#F0E8DA)'}}>
                         <div className="flex items-center justify-between mb-1">
                           <div className="text-[9px] font-bold flex items-center gap-1" style={{color:'#3A2818'}}>
-                            🎨 8-Frame Action Breakdown (2×4)
-                            <span className="text-[8px] font-normal text-gray-500">(hand-drawn ref → Omni Flash 10s)</span>
+                            🎨 Director 8-Frame Breakdown (2×4)
+                            <span className="text-[8px] font-normal text-gray-500">(VO + text + camera + bridge → Omni 10s)</span>
                           </div>
                           <div className="flex gap-1">
                             {/* V22.4 — Primary CTA: copy Omni prompt + open Flow */}
@@ -12813,8 +12970,8 @@ OUTPUT REQUIREMENTS:
                         </div>
                         <img
                           src={`data:image/png;base64,${s.framePackB64}`}
-                          className="w-full rounded border border-orange-300 cursor-pointer hover:opacity-90"
-                          alt="Action breakdown 2x2"
+                          className="w-full max-h-[460px] object-contain bg-white rounded border border-orange-300 cursor-pointer hover:opacity-90"
+                          alt="Director 8-frame action breakdown 2x4"
                           onClick={()=>{
                             // Open in new tab for full-size view
                             const w = window.open('', '_blank');
@@ -12823,7 +12980,7 @@ OUTPUT REQUIREMENTS:
                           title="Click to open full-size"
                         />
                         <div className="text-[8px] text-gray-600 mt-1 leading-tight">
-                          💡 Feed ảnh này + scene image làm reference cho Veo/Omni Flash → video cinematic theo đúng 4 frame breakdown
+                          💡 Feed ảnh này + scene image cho Omni Flash. Prompt 📋 đã chứa full 8-beat timeline nên video vẫn mượt kể cả khi chữ trên ảnh khó đọc.
                         </div>
                       </div>
                     )}
@@ -19710,9 +19867,50 @@ function App() {
     setToast({type:'success', msg:`✨ New pack "${name}" — clean workspace, no prior assets`});
   };
 
-  // V14.9 — handleLoadDemo removed (demo data deprecated)
+  // P0 — instant demo pack for first-time users. Uses bundled DEMO_DATA, no API/Vault required.
+  const handleLoadDemo = async () => {
+    try {
+      const demo = JSON.parse(JSON.stringify(DEMO_DATA));
+      const id = newPackId();
+      const now = Date.now();
+      const monthId = newMonthId();
+      const pack = {
+        id,
+        name: `${demo.brand?.name || 'Demo'} · 30-Day Demo Pack`,
+        brand: demo.brand,
+        posts: demo.posts || [],
+        months: [{ id: monthId, name: 'Demo Month · 30 ngày content', created_at: now, posts: demo.posts || [] }],
+        active_month_id: monthId,
+        mascotRefs: [],
+        productRefs: [],
+        image_count: 0,
+        audio_count: 0,
+        video_count: 0,
+        scene_count: 0,
+        created_at: now,
+        updated_at: now,
+        is_demo: true
+      };
+      await savePack(pack);
+      setCurrentPackId(id);
+      setCurrentPackIdState(id);
+      setBrand(pack.brand);
+      setPosts(pack.posts);
+      setMonths(pack.months);
+      setActiveMonthId(monthId);
+      setMascotRefs([]);
+      setProductRefs([]);
+      setGeneratedImages({});
+      setSelectedPostN(pack.posts[0]?.n || null);
+      setUiState('main');
+      setToast({type:'success', msg:`⚡ Demo loaded: ${pack.posts.length} posts. Review, edit, export, then create your own pack.`, duration: 7000});
+      try { awardXP(20, '⚡ Opened demo 30-day pack', { questProgress: ['q1'] }); } catch(e) {}
+    } catch(e) {
+      setToast({type:'error', msg:'Demo load failed: ' + e.message.slice(0,80)});
+    }
+  };
 
-  const handleLoadJSON = (obj) => { setBrand(obj.brand); setPosts(obj.posts); setUiState("main"); };
+  const handleLoadJSON = (obj) => { setBrand(obj.brand); setPosts(obj.posts); setSelectedPostN(obj.posts?.[0]?.n || null); setUiState("main"); };
 
   const handleNewPack = () => {
     if (posts.length > 0 && !confirm("Clear current pack and start over? Generated images will be deleted.")) return;
@@ -19749,7 +19947,7 @@ function App() {
         postCaption: post.caption, postImagePrompt: post.image_prompt
       });
       // Scene 1 = existing post image (no API call)
-      await saveAsset({ type:'storyboard', postN:post.n, sceneN:1, base64:imageB64, mime:'image/png', source:'post-image-as-scene1', prompt:plan.scenes[0].image_prompt, brand:brand?.name, time:`${plan.scenes[0].start_s}-${plan.scenes[0].end_s}s`, action:plan.scenes[0].action });
+      await saveAsset({ type:'storyboard', postN:post.n, sceneN:1, base64:imageB64, mime:'image/png', source:'post-image-as-scene1', prompt:plan.scenes[0].image_prompt, brand:brand?.name, time:`${plan.scenes[0].start_s}-${plan.scenes[0].end_s}s`, action:plan.scenes[0].action, ...buildStoryboardSceneMeta(plan.scenes[0]) });
       // V6.6 — Scenes 2..N parallel workers (sacrifice chain ref for speed; rely on mascot+bible)
       const total = plan.scenes.length;
       const aspectR = post.aspect_ratio || brand?.default_aspect_ratio || '16:9';
@@ -19768,7 +19966,7 @@ function App() {
           try {
             // No prevSceneB64 — parallel can't chain. Rely on mascot refs + bible.
             const b64 = await geminiGenerateSceneImage(apiKey, model, job.scene.image_prompt, null, mascotRefs, productRefs, brand?.character_bible, aspectR);
-            await saveAsset({ type:'storyboard', postN:post.n, sceneN:job.idx+1, base64:b64, mime:'image/png', source:'auto-storyboard-par', prompt:job.scene.image_prompt, brand:brand?.name, time:`${job.scene.start_s}-${job.scene.end_s}s`, action:job.scene.action });
+            await saveAsset({ type:'storyboard', postN:post.n, sceneN:job.idx+1, base64:b64, mime:'image/png', source:'auto-storyboard-par', prompt:job.scene.image_prompt, brand:brand?.name, time:`${job.scene.start_s}-${job.scene.end_s}s`, action:job.scene.action, ...buildStoryboardSceneMeta(job.scene) });
             done++;
           } catch(e) {
             if (e.status === 429 || (e.message||'').includes('429') || (e.message||'').toLowerCase().includes('rate')) {
@@ -20083,7 +20281,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen pb-12">
+    <div className="min-h-screen pb-12 overflow-x-hidden">
       {uiState !== "welcome" && (
         <AppHeader
           brandName={brand?.name}
@@ -20129,6 +20327,7 @@ function App() {
       {uiState === "welcome" && (
         <WelcomeScreen
           /* V22.7 — Restore AI Wizard as primary (proven workflow: pack → workspace) */
+          onLoadDemo={handleLoadDemo}
           onStartWizard={()=>{ setShowWizard(true); }}
           onPasteJSON={()=>setShowPaste(true)}
           onSettings={()=>setShowSettings(true)}
@@ -20148,7 +20347,7 @@ function App() {
       {uiState === "main" && posts.length > 0 && (
         <button
           onClick={()=>setShowAutoSchedule(true)}
-          className="fixed bottom-6 right-6 z-40 shadow-2xl rounded-full flex items-center gap-2 font-bold text-white hover:scale-105 transition-transform"
+          className="mobile-hide-fab fixed bottom-6 right-6 z-40 shadow-2xl rounded-full flex items-center gap-2 font-bold text-white hover:scale-105 transition-transform"
           style={{
             background: 'linear-gradient(135deg, #06B6D4 0%, #0EA5E9 50%, #3B82F6 100%)',
             padding: '14px 22px',
@@ -20162,7 +20361,7 @@ function App() {
       )}
 
       {uiState === "main" && (
-        <div className="max-w-[1600px] mx-auto p-3 md:p-5">
+        <div className="mobile-app-shell max-w-[1600px] mx-auto p-3 md:p-5">
           {tierState && (tierState.expired || (tierState.tier === 'trial' && tierState.daysLeft <= 7)) && (
             <div className={`rounded-lg p-3 mb-3 flex items-center justify-between gap-3 flex-wrap ${tierState.expired ? 'bg-rose-50 border-2 border-rose-300' : 'bg-amber-50 border border-amber-300'}`}>
               <div className="text-sm font-vn">
@@ -20306,6 +20505,21 @@ function App() {
                 <div className="glass-card p-8 text-center text-gray-500">No posts match the current filter.</div>
               ) : (
                 <>
+                  {/* V23.0 — Mobile command strip: one clear mode instruction above the active pane. */}
+                  <div className="mobile-mode-strip lg:hidden">
+                    <div className="min-w-0">
+                      <div className="text-[10px] font-bold uppercase tracking-wide text-amber-700">Mobile Command Center</div>
+                      <div className="text-sm font-bold text-gray-900 truncate">
+                        {mobileTab === 'preview' ? 'Preview creative' : mobileTab === 'browse' ? `Posts queue · ${filteredPosts.length}` : 'Edit selected post'}
+                      </div>
+                      <div className="text-[11px] text-gray-600">
+                        {mobileTab === 'preview' ? 'Check visual/audio/video before editing.' : mobileTab === 'browse' ? 'Pick a post, then jump back to Edit.' : 'Main workspace for caption, assets, storyboard and publish.'}
+                      </div>
+                    </div>
+                    <button onClick={()=>setMobileTab(mobileTab === 'edit' ? 'preview' : 'edit')} className="btn-ghost text-xs font-bold shrink-0">
+                      {mobileTab === 'edit' ? 'Preview' : 'Edit'}
+                    </button>
+                  </div>
                   <div className={
                     // V7.9 — Layout matrix
                     !previewMode
@@ -20406,19 +20620,19 @@ function App() {
                     </div>
                   </div>
                   {/* V7.9 — Mobile bottom tab bar (only <lg) */}
-                  <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] safe-area-bottom">
-                    <div className="grid grid-cols-3 gap-0">
+                  <div className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] safe-area-bottom">
+                    <div className="grid grid-cols-3 gap-0 px-1">
                       {previewMode && (
-                        <button onClick={()=>setMobileTab('preview')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] ${mobileTab==='preview' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
+                        <button onClick={()=>setMobileTab('preview')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] rounded-2xl ${mobileTab==='preview' ? 'active-mobile-tab text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
                           <span className="text-xl leading-none">👁️</span>
                           <span className="text-[10px] mt-1 font-semibold">Preview</span>
                         </button>
                       )}
-                      <button onClick={()=>setMobileTab('browse')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] ${mobileTab==='browse' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
+                      <button onClick={()=>setMobileTab('browse')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] rounded-2xl ${mobileTab==='browse' ? 'active-mobile-tab text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
                         <span className="text-xl leading-none">📋</span>
-                        <span className="text-[10px] mt-1 font-semibold">Browse <span className="text-[9px] opacity-60">({filteredPosts.length})</span></span>
+                        <span className="text-[10px] mt-1 font-semibold">Posts <span className="text-[9px] opacity-60">({filteredPosts.length})</span></span>
                       </button>
-                      <button onClick={()=>setMobileTab('edit')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] ${mobileTab==='edit' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
+                      <button onClick={()=>setMobileTab('edit')} className={`flex flex-col items-center justify-center py-2.5 min-h-[56px] rounded-2xl ${mobileTab==='edit' ? 'active-mobile-tab text-indigo-600 bg-indigo-50' : 'text-gray-600'}`}>
                         <span className="text-xl leading-none">✏️</span>
                         <span className="text-[10px] mt-1 font-semibold">Edit</span>
                       </button>
@@ -20713,123 +20927,6 @@ function App() {
         setToast={setToast}
         onSuccess={()=>{}}
         onOpenStoryboard={(p)=>{ setStoryboardPost(p); }}
-      />}
-
-      <GenerateAllBar progress={batchProgress} total={batchTotal} inProgress={batchInProgress} onCancel={()=>{ batchCancelRef.current = true; }} />
-      <Toast toast={toast} onClose={()=>setToast(null)} />
-    </div>
-  );
-}
-
-const root = createRoot(document.getElementById('root'));
-root.render(<App />);
-</script>
-</body>
-</html>
-dPost={boostPost.scheduledPost}
-          packId={currentPackId}
-          brand={brand}
-          onClose={()=>setBoostPost(null)}
-          setToast={setToast}
-          onBoosted={()=>setBoostPost(null)}
-        />
-      )}
-      {/* V14.36 — CreateAdModal */}
-      {createAdPost && (
-        <CreateAdModal
-          post={createAdPost.post}
-          scheduledPost={createAdPost.scheduledPost}
-          packId={currentPackId}
-          brand={brand}
-          generatedImageB64={generatedImages?.[createAdPost.post?.n]}
-          onClose={()=>setCreateAdPost(null)}
-          setToast={setToast}
-          onCreated={()=>setCreateAdPost(null)}
-        />
-      )}
-      {showAutoSchedule && (
-        <AutoScheduleModal
-          onClose={()=>setShowAutoSchedule(false)}
-          packId={currentPackId}
-          posts={posts}
-          generatedImages={generatedImages}
-          setToast={setToast}
-          onOpenZernioConnect={()=>{ setShowAutoSchedule(false); setShowZernioConnect(true); }}
-          onDone={(results)=>{
-            const okN = results.filter(r => r.ok).length;
-            if (okN > 0) { try { awardXP(okN * 5, `📅 Auto-Schedule ${okN} posts`, { questProgress: ['q4'] }); } catch (e) {} }
-          }}
-        />
-      )}
-      {showZernioConnect && (
-        <ZernioConnectModal
-          onClose={()=>setShowZernioConnect(false)}
-          setToast={setToast}
-          onConnected={()=>{ fetch('/api/zernio/status', {credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(setZernioStatus); }}
-        />
-      )}
-      {zernioPublishPost && (
-        <ZernioPublishModal
-          post={zernioPublishPost}
-          brand={brand}
-          imageB64={generatedImages[zernioPublishPost.n]}
-          packId={currentPackId}
-          externalMedia={studioExternalMedia || externalMedia?.[zernioPublishPost.n]}
-          onClose={()=>{ setZernioPublishPost(null); setStudioExternalMedia(null); }}
-          setToast={setToast}
-          onPublished={(data)=>{
-            const isFirst = !questHasPublished && (zernioStatus?.published_count || 0) === 0;
-            try { awardXP(isFirst ? 150 : 50, isFirst ? '🚀 First publish!' : '📤 Published bài mới', isFirst ? { completeQuest: 'q4', badge: 'first-publish' } : { questProgress: ['q4', 'published'] }); } catch(e){}
-            try { tickDailyQuestProgress('publish'); } catch(e){}
-            setQuestHasPublished(true);
-            fetch('/api/zernio/status', {credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(setZernioStatus);
-          }}
-        />
-      )}
-      {zernioInsightsPost && (
-        <ZernioInsightsModal
-          packId={currentPackId}
-          post={zernioInsightsPost}
-          onClose={()=>setZernioInsightsPost(null)}
-          setToast={setToast}
-        />
-      )}
-      {showPaste && <PasteJSONModal onClose={()=>setShowPaste(false)} onLoad={handleLoadJSON} setToast={setToast} />}
-      {showSchedule && (
-        <ScheduleViewModal
-          onClose={()=>setShowSchedule(false)}
-          packId={currentPackId}
-          posts={posts}
-          generatedImages={generatedImages}
-          setToast={setToast}
-          onOpenPostPublish={(p)=>{
-            if (!zernioStatus?.connected || !zernioStatus?.key_valid) { setToast({type:'warn', msg:'Connect Zernio trước'}); setShowZernioConnect(true); return; }
-            setZernioPublishPost(p);
-          }}
-          onSelectPostForEdit={(p)=>{ setSelectedPostN(p.n); setEditPost(p); }}
-        />
-      )}
-      {editPost && <EditPostModal post={editPost} onClose={()=>setEditPost(null)} onSave={handleEditSave} apiKey={apiKey} brand={brand} setToast={setToast} />}
-      {showAccount && <AccountModal onClose={()=>setShowAccount(false)} cloudUser={cloudUser} cloudTier={cloudTier} cloudPacksCount={cloudPacksCount} onSignOut={()=>{ setCloudUser(null); setCloudTier(null); setCloudPacksCount(0); }} setToast={setToast} />}
-      {showProjects && <ProjectsModal currentPackId={currentPackId} onClose={()=>{ setShowProjects(false); listPacks().then(setPacks).catch(()=>{}); }} onOpenPack={handleOpenPack} onNewPack={handleCreateNewPack} setToast={setToast} cloudUser={cloudUser} zernioStatus={zernioStatus} />}
-      {storyboardPost && <StoryboardEditorModal post={storyboardPost} brand={brand} apiKey={apiKey} model={model} mascotRefs={mascotRefs} productRefs={productRefs} onClose={()=>setStoryboardPost(null)} setToast={setToast} />}
-      {showLibrary && <AssetLibrary brand={brand} onClose={()=>setShowLibrary(false)} setToast={setToast} onUseAsRef={(a)=>{
-        const ref = { mime: a.mime, base64: a.base64 };
-        if (a.type === 'mascot') setMascotRefs(prev=>[...prev, ref]);
-        else if (a.type === 'product') setProductRefs(prev=>[...prev, ref]);
-      }} />}
-      {videoModalPost && <VideoGenModal post={videoModalPost} imageB64={generatedImages[videoModalPost.n]} apiKey={apiKey} brand={brand} onClose={()=>setVideoModalPost(null)} setToast={setToast} onSuccess={(meta)=>{ setVideoModalPost(null); }} />}
-      {voiceModalPost && <VoiceGenModal
-        post={voiceModalPost}
-        apiKey={apiKey}
-        brand={brand}
-        imageB64={generatedImages[voiceModalPost.n]}
-        mascotRefs={mascotRefs}
-        productRefs={productRefs}
-        imageModel={model}
-        onClose={()=>setVoiceModalPost(null)}
-        setToast={setToast}
-        onSuccess={()=>{}}
       />}
 
       <GenerateAllBar progress={batchProgress} total={batchTotal} inProgress={batchInProgress} onCancel={()=>{ batchCancelRef.current = true; }} />

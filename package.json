@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "validate:html": "node tools_validate_html.js fb-pack-studio.html && node tools_validate_html.js fb-pack-studio-deploy/index.html",
+    "validate:functions": "node tools_validate_functions.js fb-pack-studio-deploy/functions",
+    "validate": "npm run validate:html && npm run validate:functions"
+  },
   "dependencies": {
+    "@babel/parser": "^7.29.7",
     "docx": "^9.6.1"
   }
 }
